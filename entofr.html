@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>change WET file language</title>
 <script src="../util/str_format_helpers.js"></script> 
-<script src="../util/array_helpers.js"></script>
+<script src="../util/array_helpers.js"></script> 
 <script src="../util/download.js"></script> 
 <script src="part1_strip_html.js"></script> 
 <script src="part2_print_diff_len.js"></script> 
@@ -18,21 +18,6 @@ script_notify = "SUPERSCRIPTORSUBSCRIPT"
 Part 1 - get content
 =================================
 */
-
-// read in uploaded file as string
-function upload(element_id) {
-	// store file in array
-	curr_file = []
-	// read file using file reader
-	file_reader = new FileReader()
-	file_str = document.getElementById(element_id).files[0]
-	file_reader.onload = function(event) {
-		// save string to array
-		curr_file[0] = event.target.result
-	}
-	file_reader.readAsText(file_str)
-	return curr_file[0]
-}
 
 // Get uploaded files and download their lists of contents
 function create_content_lists() {
@@ -292,17 +277,19 @@ function create_fr_html(dl = false) {
 </head>
 
 <body>
-<div><form>
-  Dreamweaver-generated English HTML:
-  <input id="dirty_en" type="file" />
-  <br>
-  <br>
-  Dreamweaver-generated French HTML:
-  <input id="dirty_fr" type="file" />
-  <br>
-  <br>
-</form>
-<button onclick="create_content_lists()">Download English and French values</button></div>
+<div>
+  <form>
+    Dreamweaver-generated English HTML:
+    <input id="dirty_en" type="file" />
+    <br>
+    <br>
+    Dreamweaver-generated French HTML:
+    <input id="dirty_fr" type="file" />
+    <br>
+    <br>
+  </form>
+  <button onclick="create_content_lists()">Download English and French values</button>
+</div>
 <br>
 <br>
 <br>
@@ -318,19 +305,24 @@ function create_fr_html(dl = false) {
   WET English HTML:
   <input id="cleaned_en" type="file" />
   <br>
-  <br><br>
+  <br>
+  <br>
   Minimum content length difference to check for in log (multiples):
-  <input id="len_diff" type="number" value="3" /> times
-  <br><br>
+  <input id="len_diff" type="number" value="3" />
+  times <br>
+  <br>
   Number of content length differences to skip:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <input id="len_skip" type="number" value="0" />
   <br>
   <br>
   Minimum content length for partial matches (content is found in part of a tag/line, but the tag/line doesn't consist entirely of it):
-  <input id="min_content_len" type="number" value="10" /> times
-  <br><br>
+  <input id="min_content_len" type="number" value="10" />
+  times <br>
+  <br>
 </form>
-<button onclick="create_fr_html()">Check WET French HTML</button><br><br>
+<button onclick="create_fr_html()">Check WET French HTML</button>
+<br>
+<br>
 <button onclick="create_fr_html(true)">Download WET French HTML</button>
 <br>
 <br>
@@ -349,7 +341,10 @@ function create_fr_html(dl = false) {
   <li>Upload the values below after you've made sure they align.</li>
   <li>Upload the English document that was formatted by WET standards.</li>
   <li>Download the French document that should now be formatted by WET standards.</li>
-  <li><p><strong>Pasting word documents into Dreamweaver does NOT include superscripts and subscripts</strong> - you will have to add these in manually.</p><p>Lines that include &lt;sub&gt; or &lt;sup&gt; have been marked by SUPERSCRIPTORSUBSCRIPT. Go through the document and search for SUPERSCRIPTORSUBSCRIPT to manually add in superscripts and subscripts.</p></li>
+  <li>
+    <p><strong>Pasting word documents into Dreamweaver does NOT include superscripts and subscripts</strong> - you will have to add these in manually.</p>
+    <p>Lines that include &lt;sub&gt; or &lt;sup&gt; have been marked by SUPERSCRIPTORSUBSCRIPT. Go through the document and search for SUPERSCRIPTORSUBSCRIPT to manually add in superscripts and subscripts.</p>
+  </li>
   <li>Make sure to double check with beyond compare as usual.</li>
 </ol>
 <p>Possible todos:</p>
