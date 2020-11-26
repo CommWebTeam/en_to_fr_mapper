@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>change WET file language</title>
+<script src="https://commwebteam.github.io/util/str_format_helpers.js"></script> 
+<script src="https://commwebteam.github.io/util/array_helpers.js"></script>
+<script src="https://commwebteam.github.io/util/download.js"></script> 
+<script>
+/*
+=================================
+Part 1 - get content
+=================================
+*/
+// formats html file and strips all of its tags to create a list of content values
+function strip_html(html_str) {
+	html_arr = html_str.split('\n')
+	// remove first few lines of html file
+	html_arr = html_arr.slice(6, html_arr.length)
+	// remove logiterms
+	html_arr = html_arr.map(x => x.replaceAll(/<a name="lt_[a-zA-z0-9]+">([^<]*)<\/a>/g, "$1"))
+	// replace special characters
+	html_arr = html_arr.map(replace_special_chars)
+	// make spacings consistent
+	html_arr = html_arr.map(rm_extra_space)
+	// get rid of tags
+	html_arr = html_arr.map(rm_tags_all)
+	// remove indents, list numberings, and empty lines
+	html_arr = trim_arr(html_arr)
+	html_arr = html_arr.map(rm_list)
+	html_arr = rm_empty_lines(html_arr)
+	html_arr = trim_arr(html_arr)
+	// join array back into string and split it again to get actual list
+	html_str_cleaned = html_arr.join('\n')
+	html_arr = html_str_cleaned.split('\n')
+	// remove empty lines and lines that only consist of non-alphanumeric characters
+	html_arr = rm_substr(html_arr, /^[^a-zA-z0-9]+$/g)
+	html_arr = rm_empty_lines(html_arr)
+	html_arr = trim_arr(html_arr)
+	console.log(html_arr.length)
+	return html_arr.join('\n')
+}
+
+// Get uploaded files and download their lists of contents
+function create_content_lists() {
+	// English
+	// read in uploaded file as string
+	file_reader_en = new FileReader()
+	dirty_file_en = document.getElementById("dirty_en").files[0]
+	file_reader_en.onload = function(event) {
+		// clean string
+		console.log("number of en values:")
+		values_en = strip_html(event.target.result)
+		// download file
+		download(values_en, "en_values.txt", "text/plain")
+	}
+	file_reader_en.readAsText(dirty_file_en)
+	
+	// French
+	file_reader_fr = new FileReader()
+	dirty_fr_file = document.getElementById("dirty_fr").files[0]
+	file_reader_fr.onload = function(event) {
+		console.log("number of fr values:")
+		values_fr = strip_html(event.target.result)
+		download(values_fr, "fr_values.txt", "text/plain")
+	}
+	file_reader_fr.readAsText(dirty_fr_file)
+}
+
+/*
+=================================
+Part 2 - create french structure
+=================================
+*/
+
+// Print content index
+function print_contents(i, en, fr) {
+	console.log(i + 1)
+	//console.log("English regex:")
+	console.log(en)
+	//console.log("French content at index:")
+	console.log(fr)
+}
+
+// Print first content index that differs in length
+function print_diff_len(en_contents, fr_contents, len_diff, diff_skip) {
+	ncontents = Math.min(en_contents.length, fr_contents.length)
+	to_skip = diff_skip
+	console.log("Content lengths:")
+	console.log(en_contents.length)
+	console.log(fr_contents.length)
+	console.log("First line (after skips) with major length difference:")
+	for (i = 0; i < ncontents; i++) {
+		if (en_contents[i].length > (fr_contents[i].length * len_diff)) {
+			if (to_skip == 0) {
+				print_contents(i, en_contents[i], fr_contents[i])
+				return i
+			}
+			else  {
+				to_skip--
+			}
+		}
+		else if (fr_contents[i].length > (en_contents[i].length * len_diff)) {
+			if (to_skip == 0) {
+				print_contents(i, en_contents[i], fr_contents[i])
+				return i
+			}
+			else  {
+				to_skip--
+			}
+		}
+	}
+}
+
+// Change a content list string to be a regex valid array for searches
+function convert_content_to_regex(content_list) {
+	converted_contents = replace_regex_chars(content_list)
+	converted_contents = replace_special_chars(converted_contents)
+	converted_contents = rm_extra_space(converted_contents).split("\n")
+	converted_contents = converted_contents.map(x => x.replaceAll(/^ *(&nbsp;)* *$/g, ""))
+	// replace blank lines with some unmatchable string to exclude from regex
+	converted_contents = replace_empty_lines(converted_contents, "PLACEHOLDERFILLER123456789")
+	return converted_contents
+}
+
+// Replace English substrings with French substrings
+function replace_en_with_fr(structure, en_contents, fr_contents) {
+	// loop to find english content in structured english html and replace it with equivalent french content
+	fr_structure = structure
+	ncontents = Math.min(en_contents.length, fr_contents.length)
+	// first loop - replace full lines or tags
+	console.log(en_contents[ncontents - 1])
+	for (i = 0; i < ncontents; i++) {
+		newline_match = new RegExp("([\n>] *)" + en_contents[i].trim() + "( *[\n<])", "g")
+		fr_structure = fr_structure.replaceAll(newline_match, "$1" + fr_contents[i] + "$2")
+	}
+	console.log("loop1")
+	// // second loop - replace all instances of english string containing entire words
+	// for (i = 0; i < ncontents; i++) {
+	// 	word_match = new RegExp("([^a-zA-Z0-9])" + en_contents[i].trim() + "([^a-zA-Z0-9])", "g")
+	// 	fr_structure = fr_structure.replaceAll(word_match, "$1" + fr_contents[i] + "$2")
+	// }
+	// console.log("loop2")
+	// third loop - remove special characters, allow for any non-alphanumeric character between spaces
+	for (i = 0; i < ncontents; i++) {
+		special_value = en_contents[i].trim().replaceAll(/&[a-zA-Z0-9]+;/g, " ")
+		special_value = special_value.replaceAll(/[^a-zA-Z0-9]/g, "[^a-zA-Z0-9]")
+		special_match = new RegExp("([\n>] *)" + special_value + "( *[\n<])", "g")
+		fr_structure = fr_structure.replaceAll(special_match, "$1" + fr_contents[i] + "$2")
+	}
+	console.log("loop3")
+	// replace link formattings and footnotes
+	fr_structure = fr_structure.replaceAll("/eng/", "/fra/")
+	fr_structure = fr_structure.replaceAll("/Eng/", "/Fra/")
+	fr_structure = fr_structure.replaceAll("Footnote", "Note de bas de page")
+	fr_structure = fr_structure.replaceAll("Return to footnote", "Retour à la référence de la note de bas de page")
+	return fr_structure
+}
+
+// Get lists of contents and replace English terms with French terms
+function create_fr_html(dl = false) {
+	// file inputs - en content and fr content in that order
+	content_inputs = ["", ""]
+	// read in content files as strings
+	// english content
+	file_reader_content_en = new FileReader()
+	content_str_en = document.getElementById("content_en").files[0]
+	file_reader_content_en.onload = function(event) {
+		content_inputs[0] = event.target.result
+	}
+	file_reader_content_en.readAsText(content_str_en)
+    // french content
+	file_reader_content_fr = new FileReader()
+	content_str_fr = document.getElementById("content_fr").files[0]
+	file_reader_content_fr.onload = function(event) {
+		content_inputs[1] = event.target.result
+	}
+	file_reader_content_fr.readAsText(content_str_fr)
+	
+	// read in english structure
+	file_reader_en_struct = new FileReader()
+	struct_str_en = document.getElementById("cleaned_en").files[0]
+	file_reader_en_struct.onload = function(event) {
+		structure = replace_special_chars(event.target.result)
+		structure = rm_extra_space(structure)
+		// read in contents for both english and french
+		// need to use english contents in regex
+		en_contents = convert_content_to_regex(content_inputs[0])
+		fr_contents = content_inputs[1].split("\n")
+		// check for length differences
+		min_len_diff = document.getElementById("len_diff").value
+		len_diff_skip = document.getElementById("len_skip").value
+		print_diff_len(en_contents, fr_contents, min_len_diff, len_diff_skip)
+		if (dl) {
+			// replace english content in structure with french content
+			console.log(en_contents[en_contents.length - 1])
+			new_structure = replace_en_with_fr(structure, en_contents, fr_contents)
+			// download structure with french content
+			download(new_structure, "fr_html.html", "text/html")
+		}
+	}
+	file_reader_en_struct.readAsText(struct_str_en)
+}
+
+
+</script>
+</head>
+
+<body>
+<form>
+  Dreamweaver-generated English HTML:
+  <input id="dirty_en" type="file" />
+  <br>
+  <br>
+  Dreamweaver-generated French HTML:
+  <input id="dirty_fr" type="file" />
+  <br>
+  <br>
+</form>
+<button onclick="create_content_lists()">Download English and French values</button>
+<br>
+<br>
+<br>
+<form>
+  Aligned English values generated above:
+  <input id="content_en" type="file" />
+  <br>
+  <br>
+  Aligned French values generated above:
+  <input id="content_fr" type="file" />
+  <br>
+  <br>
+  WET English HTML:
+  <input id="cleaned_en" type="file" />
+  <br>
+  <br><br>
+  Minimum content length difference to check for in log (multiples):
+  <input id="len_diff" type="number" value="3" /> times
+  <br><br>
+  Number of content length differences to skip:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input id="len_skip" type="number" value="0" />
+  <br>
+  <br>
+</form>
+<button onclick="create_fr_html()">Check WET French HTML</button><br><br>
+<button onclick="create_fr_html(true)">Download WET French HTML</button>
+<br>
+<br>
+<br>
+<p>This application tries to fill in the wet French document after the wet English document has been manually completed. It works on the assumptions that a) the original (non-wet) documents have similar document structures and b) the wet html documents should have identical structures. With that in mind, it replaces the English values in the wet html document with their equivalent French values.</p>
+<p>This can also be used in reverse if the French document was formatted by wet first.</p>
+<p>Steps:</p>
+<ol>
+  <li>In Word, stop tracking changes.</li>
+  <li>Remove filled-in values and formatting from both the English and French word documents (ctrl+6 and ctrl+shift+n - you may want to save copies of the documents before doing this).</li>
+  <li>Paste these documents as HTML files into the Dreamweaver design view in separate files.</li>
+  <li>Upload these two HTML files below.</li>
+  <li>Download the values that are generated (these are the html documents with the tags removed).</li>
+  <li>Make sure there are exactly the same number of English and French values (this is printed in the console) since the next part matches by index.</li>
+  <li>If they don't, manually add blank rows to the shorter document in the positions where the corresponding English and French values don't align. (It's better to add lines to the English content than remove them so you don't miss any matches. Either adding or removing lines is fine for the French content.) Any editor with row numbers is fine for this.</li>
+  <li>Upload the values below after you've made sure they align.</li>
+  <li>Upload the English document that was formatted by WET standards.</li>
+  <li>Download the French document that should now be formatted by WET standards.</li>
+  <li>Make sure to double check with beyond compare as usual.</li>
+</ol>
+<p>Todo:</p>
+<ol>
+  <li>Consider how to deal with extremely small substrings when looking for partial matches (some content is found in a tag/line but isn't the entire tag/line).</li>
+  <li>Get rid of Dreamweaver autogenerated links.</li>
+  <li>Add the option to add markers before headings for easier beyond comparing.</li>
+  <li>Remove lines consisting only of nbsp;.</li>
+  <li>Specifically because of BCBS misalignments - maybe split by [ as well?</li>
+</ol>
+</body>
+</html>
