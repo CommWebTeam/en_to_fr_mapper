@@ -1,6 +1,13 @@
 // Compare content lengths
 function compare_content_len(a, b) {
-	return a.len - b.len
+	// set all numeric substrings to length 1
+	a_nonum = a.value.replaceAll(/[0-9]+/g, "1")
+	b_nonum = b.value.replaceAll(/[0-9]+/g, "1")
+	// sort by substring length, then position
+	if (a_nonum.length == b_nonum.length) {
+		return b.position - a.position
+	}
+	return b_nonum.length - a_nonum.length
 }
 
 // Replace English substrings with French substrings
@@ -37,13 +44,14 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	*/
 	content_len = []
 	for (i = 0; i < ncontents; i++) {
-		content_len.push({position: i, len: en_contents_regex[i].length})
+		content_len.push({position: i, value: en_contents_regex[i]})
 	}
-	content_len.sort(compare_content_len).reverse()
+	content_len.sort(compare_content_len)
+	console.log(content_len)
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
 		posn = content_len[i].position
-		curr_content = en_contents_regex[posn].trim()
+		curr_content = content_len[i].value.trim()
 		curr_content_orig = en_contents_orig[posn].trim()
 		equiv_fr_content = fr_contents[posn]
 		curr_content_regex = new RegExp(curr_content, "g")
