@@ -1,6 +1,8 @@
 # English to French mapper
 A string mapper that restructures a french html document based on its english counterpart.
 
+(HTML document here)[entofr.html]
+
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
 We usually work with both english and french translations of the same document, and ideally, the structures of their word documents should be the same. The intention of this tool is for the user to only have to manually clean the english translation of the document to standards; the tool can then do most of the work for creating a cleaned french translation of the document.
