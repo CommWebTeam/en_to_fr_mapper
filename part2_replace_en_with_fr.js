@@ -67,12 +67,17 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	let unmatched_lines = 0;
 	let unmatched_excluding_placeholder = 0;
 	console.log("Unmatched lines (first 100):");
+	// get non-empty contents of math and remove from structure
+	const empty_math = "<math></math>";
+	let no_empty_math_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n").replaceAll(empty_math, "");
+	let math_contents = get_tag_contents(no_empty_math_structure, "math");
+	let no_math_structure = rm_tag_contents(no_empty_math_structure, "math");
 	// lines of structure - one to return
-	let struct_lines = en_structure.split("\n");
+	let struct_lines = no_math_structure.split("\n");
 	// one to keep track of which lines have been edited
-	let struct_lines_placeholder = en_structure.split("\n");
-	// one with superscripts and subscripts removed
-	let struct_lines_no_script = en_structure.replaceAll(/<\/*su[bp]>/g, "").split("\n");
+	let struct_lines_placeholder = no_math_structure.split("\n");
+	// one with superscripts and subscripts that have no internal tags removed
+	let struct_lines_no_script = no_math_structure.replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1").split("\n");
 	/*
 	============================
 	format en contents and convert to regex
@@ -106,6 +111,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let equiv_fr_content = fr_contents[posn];
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let content_found = false;
+		
 		/*
 		============================
 		actual values
@@ -187,7 +193,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		if (curr_content.length >= min_cont_len) {
 			// check for alphanumeric matches: leading/trailing non-alphanumeric characters are removed
-			let special_match_str = curr_content_orig.replace(/^[^0-9a-zA-Z]*(.*)/g, "$1").replace(/(.*)[^0-9a-zA-Z]*$/g, "$1");
+			let special_match_str = curr_content_orig.replace(/^[^0-9a-zA-Z]*(.*)/g, "$1").replace(/(.*?)[^0-9a-zA-Z]*$/g, "$1");
 			// internal special characters are replaced with placeholders
 			special_match_str = special_match_str.replaceAll(/&[a-zA-Z0-9]+;/g, " ");
 			// internal non-alphanumeric characters are replaced with placeholders
@@ -212,7 +218,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
 			}
 		}
-		;
 		// if match is found, change structure value and set struct counter
 		if (content_ind == -1) {
 			if (unmatched_lines < 100) {
@@ -234,5 +239,10 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	struct_lines = replace_arr(struct_lines, "Return to footnote", "Retour à la référence de la note de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnotes", "Notes de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnote", "Note de bas de page");
-	return struct_lines.join('\n');
+	// add math back in
+	let struct_str = struct_lines.join('\n');
+	for (let i = 0; i < math_contents.length; i++) {
+		struct_str = struct_str.replace(empty_math, math_contents[i]);
+	}
+	return struct_str;
 }
