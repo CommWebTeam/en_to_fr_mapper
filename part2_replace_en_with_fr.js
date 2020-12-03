@@ -55,7 +55,7 @@ function compare_content_len(a, b) {
 	const a_nonum = a.value.replaceAll(/[0-9]+/g, "1");
 	const b_nonum = b.value.replaceAll(/[0-9]+/g, "1");
 	// sort by substring length, then position
-	if (a_nonum.length == b_nonum.length) {
+	if (a_nonum.length === b_nonum.length) {
 		return b.position - a.position;
 	}
 	return b_nonum.length - a_nonum.length;
@@ -224,12 +224,12 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			}
 		}
 		// if match is found, change structure value and set struct counter
-		if (content_ind == -1) {
+		if (content_ind === -1) {
 			if (unmatched_lines < 100) {
 				console.log(posn + 1);
 			}
 			unmatched_lines++;
-			if (curr_content != unmatchable_string_emptyline) {
+			if (curr_content !== unmatchable_string_emptyline) {
 				unmatched_excluding_placeholder++;
 			}
 		}
