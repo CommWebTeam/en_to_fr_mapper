@@ -110,10 +110,11 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
 		// get equivalent french content, replacing periods and commas with english formatting
-		let equiv_fr_content = fr_contents[posn].replace(/^[,\.]*(.*)/g, "$1").replace(/(.*?)[\.,]*$/g, "$1");
-		const eng_prefix = curr_content_orig.replace(/^([,\.]*).*/g, "$1");
-		const eng_suffix = curr_content_orig.replace(/.*?([\.,]*)$/g, "$1");
-		equiv_fr_content = eng_prefix + equiv_fr_content + eng_suffix;
+		let equiv_fr_content = fr_contents[posn];
+		// let equiv_fr_content = fr_contents[posn].replace(/^[,\.]*(.*)/g, "$1").replace(/(.*?)[\.,]*$/g, "$1");
+		// const eng_prefix = curr_content_orig.replace(/^([,\.]*).*/g, "$1");
+		// const eng_suffix = curr_content_orig.replace(/.*?([\.,]*)$/g, "$1");
+		// equiv_fr_content = eng_prefix + equiv_fr_content + eng_suffix;
 		// placeholder to check if content has been found yet (ignore later checks if so)
 		let content_found = false;
 		/*
