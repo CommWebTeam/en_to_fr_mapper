@@ -53,8 +53,7 @@ function strip_html(html_str) {
 	// join array back into string and split it again to get actual list
 	html_str_cleaned = html_arr.join('\n');
 	html_arr = html_str_cleaned.split('\n');
-	// remove empty lines and lines that only consist of non-alphanumeric characters
-	html_arr = rm_substr(html_arr, /^[^a-zA-z0-9]+$/g);
+	// remove empty lines
 	html_arr = rm_empty_lines(html_arr);
 	html_arr = trim_arr(html_arr);
   // print number of elements in array
