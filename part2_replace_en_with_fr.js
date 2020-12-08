@@ -152,10 +152,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			// check for match after list numbering is removed
 			let content_no_list = curr_content.replace(/^(\\\([0-9Ii]*\\\) *)*/g, "").replace(/^([0-9Ii]*\\\.[0-9Ii]* *)*/g, "").replace(/^([0-9Ii]*-[0-9Ii]* *)/g, "");
 			let list_match = new RegExp("((^|>) *)(\\(*[0-9Ii]*[\\.\\)-][0-9Ii]* *)*" + content_no_list + "( *($|<))", "gi");
-			if (posn == 192) {
-				console.log(content_no_list)
-				console.log(list_match)
-			}
 			content_ind = regex_ind(struct_lines_placeholder, list_match, content_ind);
 			// if match is found, change structure value and set struct counter
 			if ((content_ind > -1) && (!content_found)) {
@@ -254,5 +250,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	for (let i = 0; i < math_contents.length; i++) {
 		struct_str = struct_str.replace(empty_math, math_contents[i]);
 	}
-	return struct_str;
+	// fix french apostrophes
+	return struct_str.replaceAll("'", "’");
 }
