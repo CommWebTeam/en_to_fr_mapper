@@ -37,8 +37,13 @@ function strip_html(html_str) {
 	let html_arr = html_str.split('\n');
 	// remove first few lines of html file
 	html_arr = html_arr.slice(6, html_arr.length);
-	// remove logiterms
-	html_arr = html_arr.map(x => x.replaceAll(/<a name="lt_[a-zA-z0-9]+">([^<]*)<\/a>/g, "$1"));
+	// remove logiterms, ref links, toc links
+	html_arr = html_arr.map(x => x.replaceAll(/<a name="lt_[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
+	html_arr = html_arr.map(x => x.replaceAll(/<a name="_Ref[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
+	html_arr = html_arr.map(x => x.replaceAll(/<a name="_Toc[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
+	// join consecutive bold and italics
+	html_arr = html_arr.map(x => x.replaceAll(/<\/em>( *)<em>/g, "$1"));
+	html_arr = html_arr.map(x => x.replaceAll(/<\/strong>( *)<strong>/g, "$1"));
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
 	// make spacings consistent
