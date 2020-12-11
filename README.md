@@ -30,7 +30,7 @@ Using the manually realigned outputs from part 1 as inputs, map french contents 
 The tool goes down the english content list in order of the string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order:
 - full tag/line (the content should consist of either an entire line in the new english structure, or the entire content for a tag)
 - partial tag/line (the content is only part of a line or tag)
-- full tag/line match once substrings common to list numberings are removed (for example, ignore any substring [0-9]+\. that the content begins with)
+- full tag/line match once substrings common to list numberings are removed (for example, ignore any substring [0-9Ii]+\. that the content begins with). Currently checks for numeric and roman list numberings; alphabetical list numberings aren't checked for as false positives are more likely.
 - superscript and subscript tags ignored in the new english structure
 - spacing differences ignored
 - all differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same)
@@ -41,3 +41,9 @@ To prevent false positives, some of these rules require the content being search
 Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.
 
 One of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
+
+## Beyond Comparing
+
+Since there are numerous edge cases where values may be swapped or not correctly mapped, a manual inspection should be done on the French document afterwards. 
+
+One common issue with the mapper is that punctuation differences between English and French contents (e.g. a period is bolded in the English version only) may result in duplicate / missing punctuation or spacing, so it could be worth manually searching for strings like *" ."*, *" ,"*, *".."*, and *". ."* to remove first.
