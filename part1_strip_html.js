@@ -59,9 +59,9 @@ function strip_html(html_str) {
 	html_str_cleaned = html_arr.join('\n');
 	html_arr = html_str_cleaned.split('\n');
 	// remove empty lines
-	html_arr = rm_empty_lines(html_arr);
 	html_arr = trim_arr(html_arr);
-  // print number of elements in array
+	html_arr = rm_empty_lines(html_arr);
+  	// print number of elements in array
 	console.log(html_arr.length);
 	return html_arr.join('\n');
 }
