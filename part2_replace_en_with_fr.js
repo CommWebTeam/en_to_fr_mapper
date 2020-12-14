@@ -131,9 +131,9 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			struct_lines[content_ind] = struct_lines[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
 			struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
 		}
+		let word_match = new RegExp("(^|[^a-zA-Z0-9])" + curr_content + "($|[^a-zA-Z0-9])", "gi");
 		if (curr_content.length >= min_cont_len) {
 			// check for partial match where content is found in tag/line, but tag/line doesn't consist entirely of it
-			let word_match = new RegExp("(^|[^a-zA-Z0-9])" + curr_content + "($|[^a-zA-Z0-9])", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, word_match, content_ind);
 			// if match is found, change structure value and set struct counter
 			if ((content_ind > -1) && (!content_found)) {
@@ -174,6 +174,19 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				content_found = true;
 				struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+			}
+		}
+		// also check for partial matches
+		if (curr_content.length >= min_cont_len) {
+			content_ind = regex_ind(struct_lines_no_script, word_match, content_ind);
+			// if match is found, change structure value and set struct counter
+			if ((content_ind > -1) && (!content_found)) {
+				// make sure match is actually because of a sub or sup tag
+				if (/su[bp]>/g.test(struct_lines[content_ind])) {
+					content_found = true;
+					struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
+					struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				}
 			}
 		}
 		/*
