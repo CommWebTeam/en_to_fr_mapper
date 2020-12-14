@@ -245,6 +245,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	struct_lines = replace_arr(struct_lines, "Return to footnote", "Retour à la référence de la note de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnotes", "Notes de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnote", "Note de bas de page");
+	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
 	// add math back in
 	let struct_str = struct_lines.join('\n');
 	for (let i = 0; i < math_contents.length; i++) {
