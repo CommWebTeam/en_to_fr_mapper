@@ -30,7 +30,7 @@ Using the manually realigned outputs from part 1 as inputs, map french contents 
 The tool goes down the english content list in order of the string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order:
 - full tag/line (the content should consist of either an entire line in the new english structure, or the entire content for a tag)
 - partial tag/line (the content is only part of a line or tag)
-- full tag/line match once substrings common to list numberings are removed (for example, ignore any substring [0-9Ii]+\. that the content begins with). Currently checks for numeric and roman list numberings; alphabetical list numberings aren't checked for as false positives are more likely.
+- full tag/line match once substrings common to list numberings are removed (for example, ignore any substring [0-9Ii]+\. that the content begins with). Currently checks for numeric and roman list numberings; alphabetical list numberings are optional as false positives are more likely.
 - superscript and subscript tags ignored in the new english structure
 - spacing differences ignored
 - all differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same)
@@ -50,4 +50,4 @@ French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched
 
 Since there are numerous edge cases where values may be swapped or not correctly mapped, a manual inspection should be done on the French document afterwards. 
 
-One common issue with the mapper is that punctuation differences between English and French contents (e.g. a period is bolded in the English version only) may result in duplicate / missing punctuation or spacing, so it could be worth manually searching for strings like *" ."*, *" ,"*, *".."*, and *". ."* to remove first.
+One common issue with the mapper is that punctuation differences between English and French contents (e.g. a period is bolded in the English version only) may result in duplicate / missing punctuation or spacing, so if the option isn't selected, it could be worth manually searching for strings like *" ."*, *" ,"*, *".."*, and *". ."* to remove first.

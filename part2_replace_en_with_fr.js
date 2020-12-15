@@ -40,7 +40,7 @@ function create_fr_html() {
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
 		// replace english content in structure with french content
-		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len);
+		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("fix_punct").checked);
 		// download structure with french content
 		download(new_structure, "fr_html.html", "text/html");
 	}
@@ -62,7 +62,7 @@ function compare_content_len(a, b) {
 }
 
 // Replace English substrings with French substrings
-function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len) {
+function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
 	let unmatched_excluding_placeholder = 0;
@@ -155,6 +155,18 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				struct_lines[content_ind] = struct_lines[content_ind].replace(list_match, "$1" + equiv_fr_content + "$4");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
 				continue;
+			}
+			// if alpha list option is selected, check for those as well
+			if (alpha_list) {
+				let content_no_alpha_list = curr_content.replace(/^(\\\([a-z]*\\\) *)*/g, "").replace(/^([a-z]*\\\.[0-9Ii]* *)*/g, "");
+				let alpha_list_match = new RegExp("((^|>) *)(\\(*[a-z]*[\\.\\)][a-z]* *)*" + content_no_alpha_list + "( *($|<))", "gi");
+				content_ind = regex_ind(struct_lines_placeholder, alpha_list_match, content_ind);
+				// if match is found, change structure value and set struct counter
+				if (content_ind > -1) {
+					struct_lines[content_ind] = struct_lines[content_ind].replace(alpha_list_match, "$1" + equiv_fr_content + "$4");
+					struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					continue;
+				}
 			}
 		}
 		/*
@@ -257,6 +269,20 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	struct_lines = replace_arr(struct_lines, "Footnotes", "Notes de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnote", "Note de bas de page");
 	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
+	// fix punctuation if selected
+	if (fix_punct) {
+		struct_lines = replace_arr(struct_lines, ". .", ".");
+		struct_lines = replace_arr(struct_lines, " .", ".");
+		struct_lines = replace_arr(struct_lines, "..", ".");
+		struct_lines = replace_arr(struct_lines, ", ,", ",");
+		struct_lines = replace_arr(struct_lines, " ,", ",");
+		struct_lines = replace_arr(struct_lines, ",,", ",");
+		struct_lines = replace_arr(struct_lines, "; ;", ";");
+		struct_lines = replace_arr(struct_lines, " ;", ";");
+		struct_lines = replace_arr(struct_lines, ";;", ";");
+		struct_lines = replace_arr(struct_lines, ": :", ":");
+		struct_lines = replace_arr(struct_lines, "::", ":");
+	}
 	// add math back in
 	let struct_str = struct_lines.join('\n');
 	for (let i = 0; i < math_contents.length; i++) {
