@@ -35,7 +35,9 @@ The tool goes down the english content list in order of the string length of the
 - spacing differences ignored
 - all differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same)
 
-To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For these rules, case is also ignored in the search.
+To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
+
+English links to the OSFI website and English WET footnotes are converted into French. French numberings (1er, 2ieme, 3e etc.) have their suffixes converted to superscripts.
 
 ### Potential extra step: manually adding in superscripts and subscripts
 Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.

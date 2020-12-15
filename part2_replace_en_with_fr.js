@@ -109,8 +109,11 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let curr_content = content_len[i].value.trim();
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
-		// get equivalent french content, replacing periods and commas with english formatting
+		// get equivalent french content, escaping $
 		let equiv_fr_content = fr_contents[posn].replaceAll("$", "$$$");
+		// add superscripts for lists
+		equiv_fr_content = equiv_fr_content.replaceAll(/\b1er\b/g, "1<sup>er</sup>");
+		equiv_fr_content = equiv_fr_content.replaceAll(/\b([0-9]+)e\b/g, "$1<sup>e</sup>");
 		// placeholder to check if content has been found yet (ignore later checks if so)
 		let content_found = false;
 		/*
@@ -248,9 +251,10 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	console.log(unmatched_lines);
 	console.log("Unmatched lines excluding placeholders:");
 	console.log(unmatched_excluding_placeholder);
-	// replace link formattings and footnotes
+	// translate english link formattings
 	struct_lines = replace_arr(struct_lines, "/eng/", "/fra/");
 	struct_lines = replace_arr(struct_lines, "/Eng/", "/Fra/");
+	// translate english footnotes
 	struct_lines = replace_arr(struct_lines, "Return to footnote", "Retour à la référence de la note de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnotes", "Notes de bas de page");
 	struct_lines = replace_arr(struct_lines, "Footnote", "Note de bas de page");
