@@ -110,7 +110,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
 		// get equivalent french content, replacing periods and commas with english formatting
-		let equiv_fr_content = fr_contents[posn];
+		let equiv_fr_content = fr_contents[posn].replaceAll("$", "$$$");
 		// let equiv_fr_content = fr_contents[posn].replace(/^[,\.]*(.*)/g, "$1").replace(/(.*?)[\.,]*$/g, "$1");
 		// const eng_prefix = curr_content_orig.replace(/^([,\.]*).*/g, "$1");
 		// const eng_suffix = curr_content_orig.replace(/.*?([\.,]*)$/g, "$1");
@@ -246,6 +246,13 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			if (curr_content !== unmatchable_string_emptyline) {
 				unmatched_excluding_placeholder++;
 			}
+		}
+		// test
+		if (posn == 1270) {
+			console.log(curr_content)
+			console.log(curr_content_regex)
+			console.log(content_ind)
+			console.log(struct_lines[content_ind])
 		}
 	}
 	console.log("Total unmatched lines:");
