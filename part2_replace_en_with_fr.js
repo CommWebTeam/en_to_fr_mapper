@@ -114,8 +114,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		// add superscripts for lists
 		equiv_fr_content = equiv_fr_content.replaceAll(/\b1er\b/g, "1<sup>er</sup>");
 		equiv_fr_content = equiv_fr_content.replaceAll(/\b([0-9]+)e\b/g, "$1<sup>e</sup>");
-		// placeholder to check if content has been found yet (ignore later checks if so)
-		let content_found = false;
 		/*
 		============================
 		actual values
@@ -126,19 +124,19 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let content_ind = regex_ind(struct_lines_placeholder, newline_match, -1);
 		// if match is found, change structure value and set struct counter
 		if (content_ind > -1) {
-			content_found = true;
 			struct_lines[content_ind] = struct_lines[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
 			struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+			continue;
 		}
 		let word_match = new RegExp("(^|[^a-zA-Z0-9])" + curr_content + "($|[^a-zA-Z0-9])", "gi");
 		if (curr_content.length >= min_cont_len) {
 			// check for partial match where content is found in tag/line, but tag/line doesn't consist entirely of it
 			content_ind = regex_ind(struct_lines_placeholder, word_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
-				content_found = true;
+			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
 			}
 		}
 		/*
@@ -148,15 +146,15 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		// only assume it's a list value if there are letters
 		if (/[a-zA-Z]/g.test(curr_content) && (curr_content.length >= min_cont_len)) {
-			// check for match after list numbering is removed
+			// check for match after each list numbering formatting is removed
 			let content_no_list = curr_content.replace(/^(\\\([0-9Ii]*\\\) *)*/g, "").replace(/^([0-9Ii]*\\\.[0-9Ii]* *)*/g, "").replace(/^([0-9Ii]*-[0-9Ii]* *)/g, "");
 			let list_match = new RegExp("((^|>) *)(\\(*[0-9Ii]*[\\.\\)-][0-9Ii]* *)*" + content_no_list + "( *($|<))", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, list_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
-				content_found = true;
+			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(list_match, "$1" + equiv_fr_content + "$4");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
 			}
 		}
 		/*
@@ -167,24 +165,24 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		// check for match after sup and sub tags are removed
 		content_ind = regex_ind(struct_lines_no_script, newline_match, content_ind);
 		// if match is found, change structure value and set struct counter
-		if ((content_ind > -1) && (!content_found)) {
+		if (content_ind > -1) {
 			// make sure match is actually because of a sub or sup tag
 			if (/su[bp]>/g.test(struct_lines[content_ind])) {
-				content_found = true;
 				struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
 			}
 		}
 		// also check for partial matches
 		if (curr_content.length >= min_cont_len) {
 			content_ind = regex_ind(struct_lines_no_script, word_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
+			if (content_ind > -1) {
 				// make sure match is actually because of a sub or sup tag
 				if (/su[bp]>/g.test(struct_lines[content_ind])) {
-					content_found = true;
-					struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
+						struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
 					struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					continue;
 				}
 			}
 		}
@@ -198,10 +196,10 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *") + "( *($|<))", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, space_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
-				content_found = true;
+			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
 			}
 		}
 		/*
@@ -221,19 +219,19 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			let newline_special_match = new RegExp("((^|>) *)" + special_match_str + "( *($|<))", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, newline_special_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
-				content_found = true;
+			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(newline_special_match, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
+				continue;
 			}
 			// check for partial match
 			let word_special_match = new RegExp("(^|[^a-zA-Z0-9])" + special_match_str + "($|[^a-zA-Z0-9])", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, word_special_match, content_ind);
 			// if match is found, change structure value and set struct counter
-			if ((content_ind > -1) && (!content_found)) {
-				content_found = true;
+			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(word_special_match, "$1" + equiv_fr_content + "$2");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
+				continue;
 			}
 		}
 		// if match is found, change structure value and set struct counter

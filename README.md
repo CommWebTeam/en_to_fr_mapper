@@ -37,12 +37,14 @@ The tool goes down the english content list in order of the string length of the
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
-English links to the OSFI website and English WET footnotes are converted into French. French numberings (1er, 2ieme, 3e etc.) have their suffixes converted to superscripts.
+English links to the OSFI website and English WET footnotes are converted into French.
 
 ### Potential extra step: manually adding in superscripts and subscripts
 Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.
 
 One of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
+
+French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts.
 
 ## Beyond Comparing
 
