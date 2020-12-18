@@ -22,12 +22,12 @@ This idea could be used in reverse (restructuring an English document based on i
 ## Part 1:
 Extract lists of the english and french contents from the old structures.
 
-This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "<p>x<b>   y</b>z</p>" creates a list with the following rows:
+This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>   y&lt;/b>z&lt;/p>" creates a list with the following rows:
 - x
 - y
 - z
 
-Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the English content has the string "<p>x<b>y</b>z</p>" and the French content has the string "<p>a<b>b</b>c</p>", then the English list will look like so:
+Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the English content has the string "&lt;p>x&lt;b>y&lt;/b>z&lt;/p>" and the French content has the string "&lt;p>a&lt;b>b&lt;/b>c&lt;/p>", then the English list will look like so:
 - x
 - y
 - z
@@ -37,7 +37,7 @@ And the French list will look like so:
 - b
 - c
 
-So "x" will be mapped to "a", "y" will be mapped to "b", and "z" wil be mapped to "c". This means that if the new English structure has the html "<li>y</li><li>x</li><li>z</li>", then for the French version, the tool will map this to "<li>b</li><li>a</li><li>c</li>".
+So "x" will be mapped to "a", "y" will be mapped to "b", and "z" wil be mapped to "c". This means that if the new English structure has the html "&lt;li>y&lt;/li>&lt;li>x&lt;/li>&lt;li>z&lt;/li>", then for the French version, the tool will map this to "&lt;li>b&lt;/li>&lt;li>a&lt;/li>&lt;li>c&lt;/li>".
 
 While there may be more elegant ways to map contents, I feel that this is a quick and intuitive approach. It also importantly doesn't require any background knowledge beyond (regex) string manipulation to maintain.
 
@@ -53,7 +53,7 @@ In the first case, blank rows can be added in the French contents until the valu
 
 For example, if the English document has the following html:
 
-<p>x<b>y</b>z</p>
+&lt;p>x&lt;b>y&lt;/b>z&lt;/p>
 
 It will produce the list
 - x
@@ -62,7 +62,7 @@ It will produce the list
 
 If the French document has the following html:
 
-<p>xyz</p>
+&lt;p>xyz&lt;/p>
 
 It will produce the list
 - xyz
@@ -74,18 +74,18 @@ Since the English document has an extra bold tag around "y", it has two extra ro
 
 #### Extra tag in the French document
 
-In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of. The user can denote in the English contents that the row consists of an extra tag for the French content using an opening <, followed by the name and attributes of the tag (the closing > is optional following the tag - this should work either way).
+In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of. The user can denote in the English contents that the row consists of an extra tag for the French content using an opening &lt;, followed by the name and attributes of the tag (the closing > is optional following the tag - this should work either way).
 
 For example, if the English document has the following html:
 
-<p>xyz</p>
+&lt;p>xyz&lt;/p>
 
 It will produce the list
 - xyz
 
 If the French document has the following html:
 
-<p>x<span class="osfi-txt--italic">y</span>z</p>
+&lt;p>x&lt;span class="osfi-txt--italic">y&lt;/span>z&lt;/p>
 
 It will produce the list
 - x
@@ -94,30 +94,30 @@ It will produce the list
 
 To indicate that the French list has two more rows for its extra span around y, the English list should have two rows appended indicating the opening and closing span tags:
 - xyz
-- <span class="osfi-txt--italic"
-- </span
+- &lt;span class="osfi-txt--italic"
+- &lt;/span
 
-I have also included short forms for two tags in particular for convenience. "<oti" indicates <span class="osfi-txt--italic", and "<otb" indicates <span class="osfi-txt--bold". So the English list can also be written as
+I have also included short forms for two tags in particular for convenience. "&lt;oti" indicates &lt;span class="osfi-txt--italic", and "&lt;otb" indicates &lt;span class="osfi-txt--bold". So the English list can also be written as
 - xyz
-- <oti
-- </oti
+- &lt;oti
+- &lt;/oti
 
 ## Part 2:
-Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described above, this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
+Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#Part 1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
 
 The tool orders the english content list by string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
 1. Full tag/line: the content should consist of either an entire line in the new english structure, or the entire content for a tag.
-- for example, "foo bar" will match to "<p>foo bar</p>"
+- for example, "foo bar" will match to "&lt;p>foo bar&lt;/p>"
 2. Partial tag/line: the content is only part of a line or tag.
-- for example, "bar" will match to "<p>foo bar</p>"
+- for example, "bar" will match to "&lt;p>foo bar&lt;/p>"
 3. Full tag/line match once substrings common to list numberings are removed, including "1.", "(1)", and "1-". Currently checks for numeric and roman list numberings; alphabetical list numberings are optional, since false positives are more likely.
-- for example, "1. foo bar" will match to "<p>foo bar</p>".
+- for example, "1. foo bar" will match to "&lt;p>foo bar&lt;/p>".
 4. Superscript and subscript tags ignored in the new english structure.
-- for example, "foo bar" will match to "<p>foo b<sub>ar</sub></p>".
+- for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
 5. Spacing differences ignored.
-- for example, "foo bar" will match to "<p>foo        bar</p>".
+- for example, "foo bar" will match to "&lt;p>foo        bar&lt;/p>".
 6. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
-- for example, "foo-bar" will match to "<p>foo bar</p>".
+- for example, "foo-bar" will match to "&lt;p>foo bar&lt;/p>".
 
 The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
 
@@ -125,7 +125,7 @@ Each row of the English content is only searched for once, with the first instan
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
-English content rows indicating extra French tags, as described earlier, are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
+English content rows indicating extra French tags, as described in [part 1](# Extra tag in the French document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
 After this, English links to the OSFI website and English WET footnotes are converted into French.
 
