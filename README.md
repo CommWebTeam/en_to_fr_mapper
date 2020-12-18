@@ -15,29 +15,119 @@ Input:
 Output:
 - the french html document with the new structure
 
-Using this tool is broken into two parts.
+Using this tool is broken into two parts. In short, the first part creates two lists of contents for the old structure, one for the English contents and one for the French contents. The second part searches for each English content in the new (English) structure and replaces it with the equivalent French content by index.
+
+This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
 ## Part 1:
-Extract lists of the english and french contents from the old structures. This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line.
+Extract lists of the english and french contents from the old structures.
 
-Part 2 uses the indices of these lists to map values. For example, the 5th value of the english list will map to the 5th value of the french list. While there may be more elegant ways to map contents, I feel that this is a quick and intuitive approach. It also importantly doesn't require any background knowledge beyond (regex) string manipulation to maintain.
+This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "<p>x<b>   y</b>z</p>" creates a list with the following rows:
+- x
+- y
+- z
+
+Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the English content has the string "<p>x<b>y</b>z</p>" and the French content has the string "<p>a<b>b</b>c</p>", then the English list will look like so:
+- x
+- y
+- z
+
+And the French list will look like so:
+- a
+- b
+- c
+
+So "x" will be mapped to "a", "y" will be mapped to "b", and "z" wil be mapped to "c". This means that if the new English structure has the html "<li>y</li><li>x</li><li>z</li>", then for the French version, the tool will map this to "<li>b</li><li>a</li><li>c</li>".
+
+While there may be more elegant ways to map contents, I feel that this is a quick and intuitive approach. It also importantly doesn't require any background knowledge beyond (regex) string manipulation to maintain.
+
+### Aligning values
 
 Ideally, the old structure documents will have the exact same html structure in both languages. However, this isn't usually realistic, so I have split extracting the content from the rest of the tool's workflow. The user should download the english content list (by default en_values.txt) and french content list (by default fr_values.txt), both newline-delimited, and manually ensure their indices align correctly.
 
-## Part 2:
-Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. This is done by finding each value in the list of english content in the new english structure, and replacing it with the equivalent value in the list of french content.
+There are two cases for when there are differing numbers of tags in the similar structures of the English and French documents (resulting in values not aligning correctly): the English document having an extra tag, or the French document having an extra tag. (If the two documents have different tags in the same location, this can be treated as the English document having an extra tag followed by the French document having an extra tag.)
 
-The tool goes down the english content list in order of the string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order:
-- full tag/line (the content should consist of either an entire line in the new english structure, or the entire content for a tag)
-- partial tag/line (the content is only part of a line or tag)
-- full tag/line match once substrings common to list numberings are removed (for example, ignore any substring [0-9Ii]+\. that the content begins with). Currently checks for numeric and roman list numberings; alphabetical list numberings are optional as false positives are more likely.
-- superscript and subscript tags ignored in the new english structure
-- spacing differences ignored
-- all differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same)
+#### Extra tag in the English document
+
+In the first case, blank rows can be added in the French contents until the values properly align again. This way, the extra tags in the English document will be mapped to blank values.
+
+For example, if the English document has the following html:
+
+<p>x<b>y</b>z</p>
+
+It will produce the list
+- x
+- y
+- z
+
+If the French document has the following html:
+
+<p>xyz</p>
+
+It will produce the list
+- xyz
+
+Since the English document has an extra bold tag around "y", it has two extra rows in the list. Appending two blank rows to the French list will cause the lists to align by index again. So the French list becomes
+- xyz
+- 
+- 
+
+#### Extra tag in the French document
+
+In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of. The user can denote in the English contents that the row consists of an extra tag for the French content using an opening <, followed by the name and attributes of the tag (the closing > is optional following the tag - this should work either way).
+
+For example, if the English document has the following html:
+
+<p>xyz</p>
+
+It will produce the list
+- xyz
+
+If the French document has the following html:
+
+<p>x<span class="osfi-txt--italic">y</span>z</p>
+
+It will produce the list
+- x
+- y
+- z
+
+To indicate that the French list has two more rows for its extra span around y, the English list should have two rows appended indicating the opening and closing span tags:
+- xyz
+- <span class="osfi-txt--italic"
+- </span
+
+I have also included short forms for two tags in particular for convenience. "<oti" indicates <span class="osfi-txt--italic", and "<otb" indicates <span class="osfi-txt--bold". So the English list can also be written as
+- xyz
+- <oti
+- </oti
+
+## Part 2:
+Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described above, this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
+
+The tool orders the english content list by string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
+1. Full tag/line: the content should consist of either an entire line in the new english structure, or the entire content for a tag.
+- for example, "foo bar" will match to "<p>foo bar</p>"
+2. Partial tag/line: the content is only part of a line or tag.
+- for example, "bar" will match to "<p>foo bar</p>"
+3. Full tag/line match once substrings common to list numberings are removed, including "1.", "(1)", and "1-". Currently checks for numeric and roman list numberings; alphabetical list numberings are optional, since false positives are more likely.
+- for example, "1. foo bar" will match to "<p>foo bar</p>".
+4. Superscript and subscript tags ignored in the new english structure.
+- for example, "foo bar" will match to "<p>foo b<sub>ar</sub></p>".
+5. Spacing differences ignored.
+- for example, "foo bar" will match to "<p>foo        bar</p>".
+6. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
+- for example, "foo-bar" will match to "<p>foo bar</p>".
+
+The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
+
+Each row of the English content is only searched for once, with the first instance of the content found being replaced, but duplicate English content in the list is searched for independently.
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
-English links to the OSFI website and English WET footnotes are converted into French.
+English content rows indicating extra French tags, as described earlier, are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
+
+After this, English links to the OSFI website and English WET footnotes are converted into French.
 
 ### Potential extra step: manually adding in superscripts and subscripts
 Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.

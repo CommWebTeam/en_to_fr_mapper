@@ -54,6 +54,13 @@ function compare_content_len(a, b) {
 	// set all numeric substrings to length 1
 	const a_nonum = a.value.replaceAll(/[0-9]+/g, "1");
 	const b_nonum = b.value.replaceAll(/[0-9]+/g, "1");
+	// sort content indicating an extra tag in the french content to the front
+	if (a_nonum[0] === "<" && b_nonum[0] !== "<") {
+		return -1;
+	}
+	if (a_nonum[0] !== "<" && b_nonum[0] === "<") {
+		return 1;
+	}
 	// sort by substring length, then position
 	if (a_nonum.length === b_nonum.length) {
 		return b.position - a.position;
@@ -100,7 +107,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	*/
 	let content_len = [];
 	for (let i = 0; i < ncontents; i++) {
-		content_len.push({position: i, value: en_contents_regex[i]});
+		content_len.push({position: i, value: en_contents_regex[i].trim()});
 	}
 	content_len.sort(compare_content_len);
 	// loop through english content and get its index in remaining structure
