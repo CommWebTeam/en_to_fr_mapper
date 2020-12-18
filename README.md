@@ -75,6 +75,8 @@ While there may be more elegant ways to map contents, I feel that this is a quic
 
 Ideally, the old structure documents will have the exact same html structure in both languages. However, this isn't usually realistic, so I have split extracting the content from the rest of the tool's workflow. The user should download the english content list (by default en_values.txt) and french content list (by default fr_values.txt), both newline-delimited, and manually ensure their indices align correctly.
 
+I personally use Beyond Compare to align the values since it nicely lays out the two lists side-by-side. To make this easier, go to Session -> Session Settings -> Alignment and set the files to Unaligned.
+
 There are two cases for when there are differing numbers of tags in the similar structures of the English and French documents (resulting in values not aligning correctly): the English document having an extra tag, or the French document having an extra tag. (If the two documents have different tags in the same location, this can be treated as the English document having an extra tag followed by the French document having an extra tag.)
 
 #### Extra tag in the English document
