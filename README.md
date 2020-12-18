@@ -5,15 +5,15 @@ A string mapper that restructures a french html document based on its english co
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
-[English to French mapper](#english-to-french-mapper)
-[Overview](#english-to-french-mapper)
-[Part 1](#part-1)
-[Aligning values](#english-to-french-mapper)
-[Extra English tags](#extra-trag-in-the-english-document)
-[Extra French tags](#extra-trag-in-the-french-document)
-[Part 2](#part-2)
-[Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
-[Beyond comparing](#english-to-french-mapper)
+- [English to French mapper](#english-to-french-mapper)
+- - [Overview](#english-to-french-mapper)
+- - [Part 1](#part-1)
+- - - [Aligning values](#english-to-french-mapper)
+- - - - [Extra English tags](#extra-trag-in-the-english-document)
+- - - - [Extra French tags](#extra-trag-in-the-french-document)
+- - [Part 2](#part-2)
+- - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
+- - [Beyond comparing](#english-to-french-mapper)
 
 ## Overview
 
@@ -39,7 +39,15 @@ This is mainly done by replacing the html tags with newlines so that each conten
 - y
 - z
 
-Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the old English document has the string "&lt;p>x&lt;b>y&lt;/b>z&lt;/p>" and the old French document has the string "&lt;p>a&lt;b>b&lt;/b>c&lt;/p>", then the English list will look like so:
+Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the old English document has the html
+
+&lt;p>x&lt;b>y&lt;/b>z&lt;/p>
+
+And the old French document has the html
+
+&lt;p>a&lt;b>b&lt;/b>c&lt;/p>
+
+Then the English list will look like so:
 - x
 - y
 - z
@@ -49,7 +57,17 @@ And the French list will look like so:
 - b
 - c
 
-So "x" will be mapped to "a", "y" will be mapped to "b", and "z" wil be mapped to "c". This means that if the new English structure has the html "&lt;li>y&lt;/li>&lt;li>x&lt;/li>&lt;li>z&lt;/li>", then for the French version, the tool will map this to "&lt;li>b&lt;/li>&lt;li>a&lt;/li>&lt;li>c&lt;/li>".
+So "x" will be mapped to "a", "y" will be mapped to "b", and "z" wil be mapped to "c". This means that if the new English structure has the html
+
+&lt;li>y&lt;/li>
+&lt;li>x&lt;/li>
+&lt;li>z&lt;/li>
+
+Then for the French version, the tool will map this to
+
+&lt;li>b&lt;/li>
+&lt;li>a&lt;/li>
+&lt;li>c&lt;/li>
 
 While there may be more elegant ways to map contents, I feel that this is a quick and intuitive approach. It also importantly doesn't require any background knowledge beyond (regex) string manipulation to maintain.
 
