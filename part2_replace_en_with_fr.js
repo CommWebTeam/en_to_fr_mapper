@@ -55,14 +55,15 @@ function compare_content_len(a, b) {
 	const a_nonum = a.value.replaceAll(/[0-9]+/g, "1");
 	const b_nonum = b.value.replaceAll(/[0-9]+/g, "1");
 	// sort content indicating an extra tag in the french content to the front
-	if (a_nonum[0] === "<" && b_nonum[0] !== "<") {
+	// 1st index will contain "<" (since it's escaped to \<)
+	if (a_nonum[1] === "<" && b_nonum[1] !== "<") {
 		return -1;
 	}
-	if (a_nonum[0] !== "<" && b_nonum[0] === "<") {
+	if (a_nonum[1] !== "<" && b_nonum[1] === "<") {
 		return 1;
 	}
-	// if both contents indicate an extra tag, sort by reverse position
-	if (a_nonum[0] === "<" && b_nonum[0] === "<") {
+	// if both contents indicate an extra tag, sort by reverse position (so appending is done in backwards order)
+	if (a_nonum[1] === "<" && b_nonum[1] === "<") {
 		return b.position - a.position;
 	}
 	// for regular content, sort by substring length, then position
@@ -120,14 +121,35 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		let curr_content = content_len[i].value;
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
-		// get equivalent french content, escaping $
-		let equiv_fr_content = fr_contents[posn].replaceAll("$", "$$$");
+		/*
+		============================
+		get equivalent french content
+		============================
+		*/
+		// get equivalent french content
+		let equiv_fr_content = fr_contents[posn];
+		// if first character is <, indicating extra french tag, append it to previous content with tags
+		if (curr_content[1] === "<") {
+			let extra_tag = curr_content;
+			// remove escapes
+			extra_tag = extra_tag.replaceAll("\\", "");
+			// replace specific shorthands
+			extra_tag = extra_tag.replace("<oti", '<span class="osfi-txt--italic"').replace("<otb", '<span class="osfi-txt--bold"').replace("</oti", "</span").replace("</otb", "</span");
+			// add > if needed
+			if (extra_tag.slice(-1) !== ">") {
+				extra_tag = extra_tag + ">";
+			}
+			fr_contents[posn - 1] = fr_contents[posn - 1] + extra_tag + equiv_fr_content;
+			continue;
+		}
+		// escape $ from french content
+		equiv_fr_content = equiv_fr_content.replaceAll("$", "$$$");
 		// add superscripts for lists
 		equiv_fr_content = equiv_fr_content.replaceAll(/\b1er\b/g, "1<sup>er</sup>");
 		equiv_fr_content = equiv_fr_content.replaceAll(/\b([0-9]+)e\b/g, "$1<sup>e</sup>");
 		/*
 		============================
-		actual values
+		full values
 		============================
 		*/
 		// check for fully matching tag/newline/sentence first

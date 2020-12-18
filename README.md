@@ -129,10 +129,30 @@ To indicate that the French list has two more rows for its extra span around y, 
 - &lt;span class="osfi-txt--italic"
 - &lt;/span
 
+To easily visualize this while aligning in Beyond Compare - lining these rows up side by side with English on the left, this would look like
+- English: xyz; French: x;
+- English: &lt;span class="osfi-txt--italic"; French: y;
+- English: &lt;/span; French: z;
+
+Reading from left to right, we can see that the bottom two rows, where we added tags, do look like the html structure that we will want in the new French document.
+
 I have also included short forms for two tags in particular for convenience. "&lt;oti" indicates &lt;span class="osfi-txt--italic", and "&lt;otb" indicates &lt;span class="osfi-txt--bold". So the English list can also be written as
 - xyz
 - &lt;oti
 - &lt;/oti
+
+Note that in cases where an extra opening and closing tag in the French document is next to another tag, you should still add two rows in the English content list as above, but also add an extra blank row in the French content list to maintain alignment. For example, if the English document still has the same html as above but the French document has the following html:
+
+&lt;p>&lt;span class="osfi-txt--italic">y&lt;/span>z&lt;/p>
+
+It will produce the list
+- y
+- z
+
+The English list should still include two extra rows indicating the French tags as shown above, while the French list should instead include an extra blank line to properly align with those tags:
+- 
+- y
+- z
 
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
