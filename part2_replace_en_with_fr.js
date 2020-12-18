@@ -61,9 +61,13 @@ function compare_content_len(a, b) {
 	if (a_nonum[0] !== "<" && b_nonum[0] === "<") {
 		return 1;
 	}
-	// sort by substring length, then position
-	if (a_nonum.length === b_nonum.length) {
+	// if both contents indicate an extra tag, sort by reverse position
+	if (a_nonum[0] === "<" && b_nonum[0] === "<") {
 		return b.position - a.position;
+	}
+	// for regular content, sort by substring length, then position
+	if (a_nonum.length === b_nonum.length) {
+		return a.position - b.position;
 	}
 	return b_nonum.length - a_nonum.length;
 }
@@ -113,7 +117,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
 		let posn = content_len[i].position;
-		let curr_content = content_len[i].value.trim();
+		let curr_content = content_len[i].value;
 		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
 		// get equivalent french content, escaping $
