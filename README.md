@@ -13,6 +13,7 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - - [Extra French tags](#extra-trag-in-the-french-document)
 - - [Part 2](#part-2)
 - - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
+- - - [Math](#math)
 - - [Beyond comparing](#english-to-french-mapper)
 
 ## Overview
@@ -187,6 +188,16 @@ Since Dreamweaver pastes do not distinguish superscripts and subscripts from the
 One of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
 
 French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts.
+
+### Math
+
+In some cases, math in word documents, and the old structures that are pasted from these word documents, is formatted as regular text instead of word equations. On the other hand, in a cleaned html structure, math should ideally be written using mathml for accessibility purposes. This is problematic for two reasons:
+1. Inline math, where the regular text of the content row, as parsed from the old structure, is broken into mathml tags in the cleaned structure, which means that the content won't be matched.
+2. Mathml tags may incorrectly be mapped onto by other content rows and translated instead of a non-mathml tag later in the document, preventing that non-mathml tag from being translated.
+
+The tool has two options for this:
+- Treat mathml tags as strings to match anything inside by replacing them with the regex ".*?". This will stop them from preventing content matches. The equivalent French content will still not have mathml; mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
+- Continue to allow mathml tags to break the matching of the surrounding content (ignoring problem 1), but remove its internal contents for the mapping (to prevent problem 2). If there aren't too many equations in the document, the surrounding content can be manually fixed afterward.
 
 ## Beyond Comparing
 
