@@ -49,6 +49,44 @@ function create_fr_html() {
 
 /* Helper functions */
 
+// Get (hard-coded) tier for content lengths
+function get_cont_len_tier(x) {
+	if (x.length < 10) {
+		return x.length;
+	}
+	if (x.length <= 15) { // 10 to 15
+		return 15;
+	}
+	if (x.length <= 20) { // 16 to 20
+		return 20;
+	}
+	if (x.length <= 30) { // 21 to 30
+		return 30;
+	}
+	if (x.length <= 50) { // 31 to 50
+		return 50;
+	}
+	if (x.length <= 75) { // 51 to 75
+		return 75;
+	}
+	if (x.length <= 120) { // 76 to 120
+		return 120;
+	}
+	if (x.length <= 200) { // 121 to 200
+		return 200;
+	}
+	if (x.length <= 300) { // 201 to 300
+		return 300;
+	}
+	if (x.length <= 500) { // 301 to 500
+		return 500;
+	}
+	if (x.length <= 1000) { // 501 to 1000
+		return 1000;
+	}
+	return 1001;
+}
+
 // Compare content lengths
 function compare_content_len(a, b) {
 	// set all numeric substrings to length 1
@@ -66,11 +104,13 @@ function compare_content_len(a, b) {
 	if (a_nonum[1] === "<" && b_nonum[1] === "<") {
 		return b.position - a.position;
 	}
-	// for regular content, sort by substring length, then position
-	if (a_nonum.length === b_nonum.length) {
+	// for regular content, sort by tiers of substring length, then position
+	let a_len = get_cont_len_tier(a_nonum);
+	let b_len = get_cont_len_tier(b_nonum);
+	if (a_len === b_len) {
 		return a.position - b.position;
 	}
-	return b_nonum.length - a_nonum.length;
+	return b_len - a_len;
 }
 
 // Replace English substrings with French substrings
@@ -145,6 +185,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		content_len.push({position: i, value: en_contents_regex[i].trim()});
 	}
 	content_len.sort(compare_content_len);
+	console.log(content_len)
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
 		let posn = content_len[i].position;

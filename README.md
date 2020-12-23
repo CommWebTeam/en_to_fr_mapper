@@ -158,7 +158,7 @@ The English list should still include two extra rows indicating the French tags 
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
 
-The tool orders the english content list by string length of the content (the longest pieces of content appear first on the ordered content list). For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
+The tool sorts the english content list into tiers by string length of the content (the highest tier of content, i.e. the longest pieces, appear first on the ordered content list), with content within tiers being sorted by original order. For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
 1. Full tag/line: the content should consist of either an entire line in the new english structure, or the entire content for a tag.
 - for example, "foo bar" will match to "&lt;p>foo bar&lt;/p>"
 2. Partial tag/line: the content is only part of a line or tag.
