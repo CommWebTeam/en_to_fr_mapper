@@ -165,6 +165,7 @@ In my experience, scanning for rows where the content lengths differ a lot betwe
 For example, in the same paragraph, the French document may italicize a word where the English document does not. The English document may have:
 
 &lt;p>&lt;b>Triceratops&lt;/b> is a genus of herbivorous ceratopsid dinosaur that first appeared during the late Maastrichtian stage of the late Cretaceous period, about 68 million years ago (mya) in what is now North America.&lt;/p>
+
 &lt;p>It is one of the last-known non-avian dinosaur genera, and became extinct in the Cretaceous–Paleogene extinction event 66 million years ago.&lt;/p>
 
 Which produces the list
@@ -175,6 +176,7 @@ Which produces the list
 While the French document may have:
 
 &lt;p>&lt;b>Triceratops&lt;/b> est un genre éteint célèbre de dinosaures herbivores de la famille des cératopsidés qui a vécu à la fin du Maastrichtien, au &lt;i>Crétacé supérieur&lt;/i>, il y a 68 à 66 millions d'années, dans ce qui est maintenant l'Amérique du Nord.&lt;/p>
+
 &lt;p>Il a été l'un des derniers dinosaures non-aviens vivant avant leur disparition lors de la grande extinction Crétacé-Paléogène.&lt;/p>
 
 Which produces the list
