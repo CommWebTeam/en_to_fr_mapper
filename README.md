@@ -10,8 +10,8 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - [Overview](#english-to-french-mapper)
 - - [Part 1](#part-1)
 - - - [Aligning values](#english-to-french-mapper)
-- - - - [Extra English tags](#extra-trag-in-the-english-document)
-- - - - [Extra French tags](#extra-trag-in-the-french-document)
+- - - - [Extra English tags](#extra-tag-in-the-english-document)
+- - - - [Extra French tags](#extra-tag-in-the-french-document)
 - - [Part 2](#part-2)
 - - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
 - - - [Math](#math)
@@ -152,6 +152,7 @@ It will produce the list
 - z
 
 The English list should still include two extra rows indicating the French tags as shown above, while the French list should instead include an extra blank line to properly align with those tags:
+
 - 
 - y
 - z

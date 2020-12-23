@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>change WET file language</title>
+</head>
+<body>
+<p><b>Part 1</b></p>
+<div>
+  <form>
+    Dreamweaver-generated English HTML:
+    <input id="dirty_en" type="file" />
+    <br>
+    <br>
+    Dreamweaver-generated French HTML:
+    <input id="dirty_fr" type="file" />
+    <br>
+    <br>
+  </form>
+  <button onclick="create_content_lists()">Download English and French values</button>
+</div>
+<br>
+<p><b>Part 2</b></p>
+<form>
+  Aligned English values generated above:
+  <input id="content_en" type="file" />
+  <br>
+  <br>
+  Aligned French values generated above:
+  <input id="content_fr" type="file" />
+  <br>
+  <br>
+  WET English HTML:
+  <input id="cleaned_en" type="file" />
+  <br>
+  <br>
+</form>
+<button onclick="create_fr_html()">Download WET French HTML</button>
+<br>
+<br>
+<p><i>Other options</i></p>
+<form>
+  Minimum content length for partial matches (content is found in part of a tag/line, but the tag/line doesn't consist entirely of it):
+  <input id="min_content_len" type="number" value="10" />
+  times <br>
+  <input type="checkbox" id="alpha_list" name="alpha_list" checked>
+  <label for="alpha_list">Match alpha list contents (not just numeric / roman)</label>
+  <br>
+  <input type="checkbox" id="script_check" name="script_check" checked>
+  <label for="script_check">Check for matches where superscripts and subscripts are ignored (if not checked, these will prevent a match)</label>
+  <br>
+  <input type="checkbox" id="ignore_math" name="ignore_math" checked>
+  <label for="ignore_math">Ignore mathml when matching contents (if not checked, inline math will prevent a match)</label>
+  <br>
+  <input type="checkbox" id="fix_multispace" name="fix_multispace" checked>
+  <label for="fix_multispace">Remove multispaces, including any spaces surrounding no break spaces</label>
+  <br>
+  <input type="checkbox" id="fix_punct" name="fix_punct" checked>
+  <label for="fix_punct">Fix the following incorrect punctuation strings:</label>
+  <ul>
+    <li>". ."</li>
+    <li>" ."</li>
+    <li>".."</li>
+    <li>", ,"</li>
+    <li>" ,"</li>
+    <li>",,"</li>
+    <li>"; ;"</li>
+    <li>" ;"</li>
+    <li>";;"</li>
+    <li>"::"</li>
+    <li>": :"</li>
+  </ul>
+  <br>
+</form>
+<p>This tool tries to fill in the wet French document after the wet English document has been manually completed. It works on the assumptions that a) the original (non-wet) documents have similar document structures and b) the wet html documents should have identical structures. With that in mind, it replaces the English values in the wet html document with their equivalent French values.</p>
+<p>If the console shows anything especially strange (0 lines, the entire document being unmatched, etc.), try clicking through the buttons more slowly (some of this is asynchronous).</p>
+<p>Steps:</p>
+<ul>
+  <li>Part 1 - get contents from dirty documents</li>
+  <ol>
+    <li>In Word, stop tracking changes.</li>
+    <li>You may want to save copies of the documents before doing this - remove formatting from both the English and French word documents (ctrl+shift+n). This should make the contents a bit easier to align. Depending on the document, ctrl+6 to remove filled in values may be helpful, but it also removes links.</li>
+    <li>Paste these documents as HTML files into the Dreamweaver design view in separate files.</li>
+    <li>Upload these two HTML files.</li>
+    <li>Download the values that are generated (these are the html documents with the tags removed).</li>
+    <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by index.</li>
+    <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content.
+      <ul>
+        <li>If the English document has extra rows of content (tags) that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.</li>
+        <li>If the French document has extra rows of content (tags) that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next, so that the remaining content aligns.</li>
+        <li>If the documents have different tags at the same index but are otherwise aligned, you can treat it as the English document have extra rows followed by the French document having extra rows.</li>
+      </ul>
+    </li>
+  </ol>
+  <li>Part 2 - replace english contents in cleaned english document with french contents</li>
+  <ol>
+    <li>Upload the values after you've made sure they align.</li>
+    <li>Upload the English document that was formatted by WET standards.</li>
+    <li>Download the French document that should now be formatted by WET standards.</li>
+    <li>If the option is selected, lines in the cleaned structure that needed &lt;sub&gt; or &lt;sup&gt; ignored to be matched in the English version have been marked by SUPERSCRIPTORSUBSCRIPT. Go through the cleaned French document and search for SUPERSCRIPTORSUBSCRIPT to manually add in superscripts and subscripts.</li>
+    <li>If the option is selected, inline math will not prevent a match, but the math will be mispositioned to the start of the parent tag. Manually go through &lt;math&gt; tags in the cleaned French document and reposition them correctly. If you use Dreamweaver, I recommend doing this <b>before</b> applying source formatting so that the math doesn't get moved to its own line.</li>
+    <li>Make sure to double check with beyond compare as usual. You may want to manually remove any empty tags generated by blank french content lines afterwards.</li>
+  </ol>
+</ul>
+<p>More in-depth information can be found in the <a rel="external" href="https://commwebteam.github.io/en_to_fr_mapper/">readme</a>.</p>
+<script src="https://commwebteam.github.io/util/str_format_helpers.js"></script> 
+<script src="https://commwebteam.github.io/util/array_helpers.js"></script> 
+<script src="https://commwebteam.github.io/util/download.js"></script> 
+<script src="part1_strip_html.js"></script> 
+<script src="part2_replace_en_with_fr.js"></script>
+</body>
+</html>
