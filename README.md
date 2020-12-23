@@ -5,6 +5,7 @@ A string mapper that restructures a french html document based on its english co
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
+*Table of Contents*
 - [English to French mapper](#english-to-french-mapper)
 - - [Overview](#english-to-french-mapper)
 - - [Part 1](#part-1)
@@ -28,7 +29,7 @@ Input:
 Output:
 - the french html document with the new structure
 
-Using this tool is broken into two parts. In short, the first part creates two lists of contents for the old structure, one for the English contents and one for the French contents. The second part searches for each English content in the new (English) structure and replaces it with the equivalent French content by index.
+Using this tool is broken into two parts. In short, the first part creates two lists of contents from the old structure, one for the English contents and one for the French contents. The second part searches for each English content in the new (English) structure and replaces it with the equivalent French content by index.
 
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
