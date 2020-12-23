@@ -12,6 +12,7 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - [Aligning values](#english-to-french-mapper)
 - - - - [Extra English tags](#extra-tag-in-the-english-document)
 - - - - [Extra French tags](#extra-tag-in-the-french-document)
+- - - - [Scanning for differences](#scanning-for-differences)
 - - [Part 2](#part-2)
 - - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
 - - - [Math](#math)
@@ -77,7 +78,7 @@ While there may be more elegant ways to map contents, I feel that this is a quic
 
 Ideally, the old structure documents will have the exact same html structure in both languages. However, this isn't usually realistic, so I have split extracting the content from the rest of the tool's workflow. The user should download the english content list (by default en_values.txt) and french content list (by default fr_values.txt), both newline-delimited, and manually ensure their indices align correctly.
 
-I personally use Beyond Compare to align the values since it nicely lays out the two lists side-by-side. To make this easier, go to Session -> Session Settings -> Alignment and set the files to Unaligned.
+I personally use Beyond Compare to align the values since it nicely lays out the two lists side-by-side. To make this easier, go to Session -> Session Settings -> Alignment and set the files to Unaligned. Make sure to save and reload after every edit you make to either of the files so that the rows of the two files continue to align (since each time you add a line to one of the files, they will dealign).
 
 There are two cases for when there are differing numbers of tags in the similar structures of the English and French documents (resulting in values not aligning correctly): the English document having an extra tag, or the French document having an extra tag. (If the two documents have different tags in the same location, this can be treated as the English document having an extra tag followed by the French document having an extra tag.)
 
@@ -157,6 +158,36 @@ The English list should still include two extra rows indicating the French tags 
 - y
 - z
 
+#### Scanning for differences
+
+In my experience, scanning for rows where the content lengths differ a lot between the English and French lists helps to catch the majority of misalignments (though not all). This is because most of the time, extra tags in one language will be from breaking up the content in the other.
+
+For example, in the same paragraph, the French document may italicize a word where the English document does not. The English document may have:
+
+&lt;p>&lt;b>Triceratops&lt;/b> is a genus of herbivorous ceratopsid dinosaur that first appeared during the late Maastrichtian stage of the late Cretaceous period, about 68 million years ago (mya) in what is now North America.&lt;/p>
+&lt;p>It is one of the last-known non-avian dinosaur genera, and became extinct in the Cretaceous–Paleogene extinction event 66 million years ago.&lt;/p>
+
+Which produces the list
+- Triceratops 
+- is a genus of herbivorous ceratopsid dinosaur that first appeared during the late Maastrichtian stage of the late Cretaceous period, about 68 million years ago (mya) in what is now North America.
+- It is one of the last-known non-avian dinosaur genera, and became extinct in the Cretaceous–Paleogene extinction event 66 million years ago. 
+
+While the French document may have:
+
+&lt;p>&lt;b>Triceratops&lt;/b> est un genre éteint célèbre de dinosaures herbivores de la famille des cératopsidés qui a vécu à la fin du Maastrichtien, au &lt;i>Crétacé supérieur&lt;/i>, il y a 68 à 66 millions d'années, dans ce qui est maintenant l'Amérique du Nord.&lt;/p>
+&lt;p>Il a été l'un des derniers dinosaures non-aviens vivant avant leur disparition lors de la grande extinction Crétacé-Paléogène.&lt;/p>
+
+Which produces the list
+- Triceratops
+- est un genre éteint célèbre de dinosaures herbivores de la famille des cératopsidés qui a vécu à la fin du Maastrichtien, au
+- Crétacé supérieur
+- il y a 68 à 66 millions d'années, dans ce qui est maintenant l'Amérique du Nord.
+- Il a été l'un des derniers dinosaures non-aviens vivant avant leur disparition lors de la grande extinction Crétacé-Paléogène.
+
+The French list has two extra rows because the translation of "Cretaceous period" is italicized. If we compare the English and French lists side-by-side, then we can immediately see that the third value of the French list is much shorter than the third value of the English list, meaning there is probably a misalignment in that area.
+
+Again, if you are using Beyond Compare, I recommend reloading after every edit so that the rows are always aligned correctly by index; this makes visual inspections like these much easier to perform. Other visual inspections are useful too - for example, if both the English and French lists have alpha list numberings (a. b. c. and so on) for some rows, then those list numberings should probably align.
+
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
 
@@ -180,7 +211,7 @@ Each row of the English content is only searched for once, with the first instan
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
-English content rows indicating extra French tags, as described in [part 1](#extra-tag-in-the-french-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
+[English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-french-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
 After this, English links to the OSFI website and English WET footnotes are converted into French.
 
@@ -196,6 +227,14 @@ French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched
 In some cases, math in word documents, and the old structures that are pasted from these word documents, is formatted as regular text instead of word equations. On the other hand, in a cleaned html structure, math should ideally be written using mathml for accessibility purposes. This is problematic for two reasons:
 1. Inline math, where the regular text of the content row, as parsed from the old structure, is broken into mathml tags in the cleaned structure, which means that the content won't be matched.
 2. Mathml tags may incorrectly be mapped onto by other content rows and translated instead of a non-mathml tag later in the document, preventing that non-mathml tag from being translated.
+
+For example, the old English structure might have the following paragraph which includes an equation written in regular text:
+
+&lt;p>Formula 1: x + y = z&lt;/p>
+
+In the new English structure, the equation might be converted to mathml for clarity, especially if mathml is used elsewhere in the document, so it might look like this:
+
+&lt;p>Formula 1: &lt;math>&lt;mi>x&lt;/mi>&lt;mo>+&lt;/mo>&lt;mi>y&lt;/mi>&lt;mo>=&lt;/mo>&lt;mi>z&lt;/mi>&lt;/math>&lt;/p>
 
 The tool has two options for this:
 - Treat mathml tags as strings to match anything inside by replacing them with the regex ".*?". This will stop them from preventing content matches. The equivalent French content will still not have mathml; mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.

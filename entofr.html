@@ -78,8 +78,7 @@
 <ul>
   <li>Part 1 - get contents from dirty documents</li>
   <ol>
-    <li>In Word, stop tracking changes.</li>
-    <li>You may want to save copies of the documents before doing this - remove formatting from both the English and French word documents (ctrl+shift+n). This should make the contents a bit easier to align. Depending on the document, ctrl+6 to remove filled in values may be helpful, but it also removes links.</li>
+    <li>In Word, stop tracking changes and delete comments. If there are any text boxes (that can't be copied), move their text out.</li>
     <li>Paste these documents as HTML files into the Dreamweaver design view in separate files.</li>
     <li>Upload these two HTML files.</li>
     <li>Download the values that are generated (these are the html documents with the tags removed).</li>
@@ -89,6 +88,11 @@
         <li>If the English document has extra rows of content (tags) that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.</li>
         <li>If the French document has extra rows of content (tags) that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next, so that the remaining content aligns.</li>
         <li>If the documents have different tags at the same index but are otherwise aligned, you can treat it as the English document have extra rows followed by the French document having extra rows.</li>
+      </ul>
+      Some tips if you are using Beyond Compare to align values:
+      <ul>
+        <li>Go to Session -> Session Settings -> Alignment and set the values to Unaligned so that the rows are aligned by index.</li>
+        <li>Make sure to save and reload after every change you make so that you can visually keep track of how the rows are aligned (unless you can follow it on your own), since each of your edits will dealign the rows.</li>
       </ul>
     </li>
   </ol>
