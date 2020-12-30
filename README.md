@@ -37,7 +37,7 @@ This idea could be used in reverse (restructuring an English document based on i
 ## Part 1:
 Extract lists of the english and french contents from the old structures.
 
-This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>   y&lt;/b>z&lt;/p>" creates a list with the following rows:
+This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&lt;/b>z&lt;/p>" creates a list with the following rows:
 - x
 - y
 - z
@@ -132,12 +132,12 @@ To indicate that the French list has two more rows for its extra span around y, 
 - &lt;span class="osfi-txt--italic"
 - &lt;/span
 
-To easily visualize this while aligning in Beyond Compare - lining these rows up side by side with English on the left, this would look like
+The way I visualize this while aligning in Beyond Compare is that when lining these rows up side by side, with English on the left and French on the right, this would look like
 - English: xyz; French: x;
 - English: &lt;span class="osfi-txt--italic"; French: y;
 - English: &lt;/span; French: z;
 
-Reading from left to right, we can see that the bottom two rows, where we added tags, do look like the html structure that we will want in the new French document.
+Reading from left to right, we can see that the bottom two rows, where we added tags, do look like the html structure that we will want in the new French document - that is, &lt;span class="osfi-txt--italic">y&lt;/span>.
 
 I have also included short forms for two tags in particular for convenience. "&lt;oti" indicates &lt;span class="osfi-txt--italic", and "&lt;otb" indicates &lt;span class="osfi-txt--bold". So the English list can also be written as
 - xyz
@@ -159,6 +159,8 @@ The English list should still include two extra rows indicating the French tags 
 - z
 
 #### Scanning for differences
+
+In general, the English and French documents should have roughly similar contents in terms of length and location, so visually scanning through for jarring differences between the two content lists may be much faster than comparing line by line.
 
 In my experience, scanning for rows where the content lengths differ a lot between the English and French lists helps to catch the majority of misalignments (though not all). This is because most of the time, extra tags in one language will be from breaking up the content in the other.
 
@@ -188,7 +190,11 @@ Which produces the list
 
 The French list has two extra rows because the translation of "Cretaceous period" is italicized. If we compare the English and French lists side-by-side, then we can immediately see that the third value of the French list is much shorter than the third value of the English list, meaning there is probably a misalignment in that area.
 
-Again, if you are using Beyond Compare, I recommend reloading after every edit so that the rows are always aligned correctly by index; this makes visual inspections like these much easier to perform. Other visual inspections are useful too - for example, if both the English and French lists have alpha list numberings (a. b. c. and so on) for some rows, then those list numberings should probably align.
+Outside of comparing content lengths, other quick visual inspections are useful too. For example, if both the English and French lists have alpha list numberings (a. b. c. and so on) for some rows, then those list numberings should probably align.
+
+I have also included an option that, if selected, adds a content row above the headers that consists of placeholder string, HEADERMARKERPLACEHOLDER, and a counter. If the headers are the same in both the original English and French structures, then these placeholder strings should align once the rest of the contents have been properly aligned. This is intended to make it easier to immediately see how many content rows apart the English and French versions have been misaligned by looking at how far apart the corresponding placeholder strings are. Since the counter is simply on the number of headers in the document, this only works properly if the number of headers are exactly the same and represent exactly the same positions between the English and French structures - if not, I don't recommend using this option. The placeholder strings will be automatically removed in part 2.
+
+Again, if you are using Beyond Compare, I recommend reloading after every edit so that the rows are always aligned correctly by index; this makes visual inspections like these much easier to perform.
 
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
@@ -201,7 +207,7 @@ The tool sorts the english content list into tiers by string length of the conte
 3. Full tag/line match once substrings common to list numberings are removed, including "1.", "(1)", and "1-". Currently checks for numeric and roman list numberings; alphabetical list numberings are optional, since false positives are more likely.
 - for example, "1. foo bar" will match to "&lt;p>foo bar&lt;/p>".
 4. Spacing differences ignored.
-- for example, "foo bar" will match to "&lt;p>foo        bar&lt;/p>".
+- for example, "foo bar" will match to "&lt;p>foo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar&lt;/p>".
 5. Superscript and subscript tags ignored in the new english structure.
 - for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
 6. Math tags ignored in the structure.
@@ -215,7 +221,7 @@ Note that rules 3 to 8 are checked one-by-one and independently of each other, m
 
 The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
 
-Each row of the English content is only searched for once, with the first instance of the content found being replaced, but duplicate English content in the list is searched for independently.
+Each row of the English content is only searched for once, with the first instance of the content found being replaced, but duplicate English content rows in the list are searched for independently.
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
