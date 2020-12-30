@@ -1,3 +1,5 @@
+const marker_placeholder = "HEADERMARKERPLACEHOLDER"
+
 /*
 =================================
 Part 1 - get content
@@ -12,8 +14,8 @@ function create_content_lists() {
 	let dirty_file_en = document.getElementById("dirty_en").files[0];
 	file_reader_en.onload = function(event) {
 		// clean string
-		console.log("number of en values:");
-		let values_en = strip_html(event.target.result);
+		console.log("English - ");
+		let values_en = strip_html(event.target.result, document.getElementById("insert_markers").checked);
 		// download file
 		download(values_en, "en_values.txt", "text/plain");
 	}
@@ -23,8 +25,8 @@ function create_content_lists() {
 	let file_reader_fr = new FileReader();
 	let dirty_fr_file = document.getElementById("dirty_fr").files[0];
 	file_reader_fr.onload = function(event) {
-		console.log("number of fr values:");
-		let values_fr = strip_html(event.target.result);
+		console.log("French - ");
+		let values_fr = strip_html(event.target.result, document.getElementById("insert_markers").checked);
 		download(values_fr, "fr_values.txt", "text/plain");
 	}
 	file_reader_fr.readAsText(dirty_fr_file);
@@ -33,8 +35,21 @@ function create_content_lists() {
 /* Helper functions */
 
 // formats html file and strips all of its tags to create a list of content values
-function strip_html(html_str) {
-	let html_arr = html_str.split('\n');
+function strip_html(html_str, insert_markers) {
+	// if option is selected, insert markers in front of headers
+	let header_html_str = html_str.replaceAll("\r\n", "\n");
+	if (insert_markers) {
+		const header_regex = /(<h[0-9]+)/g;
+		let num_headers = count_regex(html_str, header_regex);
+		console.log("Number of headers: " + num_headers);
+		// newline followed by space indicates untouched header
+		header_html_str = header_html_str.replaceAll(header_regex, "\n $1");
+		// add markers in front of untouched headers one at a time
+		for (let i = 0; i < num_headers; i++) {
+			header_html_str = header_html_str.replace(/(\n )+(<h[0-9]+)/g, "\n" + i + marker_placeholder + i + "$2");
+		}
+	}
+	let html_arr = header_html_str.split('\n');
 	// remove first few lines of html file
 	html_arr = html_arr.slice(6, html_arr.length);
 	// remove logiterms, ref links, toc links
@@ -61,7 +76,7 @@ function strip_html(html_str) {
 	// remove empty lines
 	html_arr = trim_arr(html_arr);
 	html_arr = rm_empty_lines(html_arr);
-  	// print number of elements in array
-	console.log(html_arr.length);
+	// print number of elements in array
+	console.log("Number of elements: " + html_arr.length);
 	return html_arr.join('\n');
 }

@@ -1,8 +1,9 @@
-const unmatchable_string_emptyline = "EMPTYLINEFILLER123456789"
-const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER"
-const math_open_placeholder = "MATHOPENPLACEHOLDER"
-const math_close_placeholder = "MATHCLOSEPLACEHOLDER"
-const script_notify = "SUPERSCRIPTORSUBSCRIPT"
+const unmatchable_string_emptyline = "EMPTYLINEFILLER123456789";
+const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
+const math_open_placeholder = "MATHOPENPLACEHOLDER";
+const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
+const script_notify = "SUPERSCRIPTORSUBSCRIPT";
+const marker_placeholder_part2 = "HEADERMARKERPLACEHOLDER";
 
 /*
 =================================
@@ -423,7 +424,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				console.log(posn + 1);
 			}
 			unmatched_lines++;
-			if (curr_content !== unmatchable_string_emptyline) {
+			if (curr_content !== unmatchable_string_emptyline && !curr_content.includes(marker_placeholder_part2)) {
 				unmatched_excluding_placeholder++;
 			}
 		}
