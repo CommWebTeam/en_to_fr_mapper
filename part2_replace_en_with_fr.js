@@ -1,5 +1,7 @@
 const unmatchable_string_emptyline = "EMPTYLINEFILLER123456789"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER"
+const math_open_placeholder = "MATHOPENPLACEHOLDER"
+const math_close_placeholder = "MATHCLOSEPLACEHOLDER"
 const script_notify = "SUPERSCRIPTORSUBSCRIPT"
 
 /*
@@ -40,7 +42,7 @@ function create_fr_html() {
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
 		// replace english content in structure with french content
-		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("script_check").checked, document.getElementById("ignore_math").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked);
+		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("script_check").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked);
 		// download structure with french content
 		download(new_structure, "fr_html.html", "text/html");
 	}
@@ -48,6 +50,26 @@ function create_fr_html() {
 }
 
 /* Helper functions */
+
+// extract mi, mo, mn from math
+function extract_mi_str(math_html_str) {
+	let mi_regex = /<m[ion].*?>(.*?)<\/m[ion]>/g;
+	let content_regex_str = "";
+	let contents = mi_regex.exec(math_html_str);
+	while (contents !== null) {
+		content_regex_str = content_regex_str + contents[1];
+		contents = mi_regex.exec(math_html_str);
+	}
+	return content_regex_str;
+}
+
+// extract placeholder math tags from html string
+function extract_math_tags(html_str) {
+	init_non_math = new RegExp("^.*?" + math_open_placeholder, "g");
+	middle_non_math = new RegExp(math_close_placeholder + ".*?" + math_open_placeholder, "g");
+	end_non_math =  new RegExp("^(.*" + math_close_placeholder + ").*$", "g");
+	return html_str.replaceAll(init_non_math, math_open_placeholder).replaceAll(middle_non_math, math_close_placeholder + math_open_placeholder).replaceAll(end_non_math, "$1");
+}
 
 // Get (hard-coded) tier for content lengths
 function get_cont_len_tier(x) {
@@ -114,52 +136,51 @@ function compare_content_len(a, b) {
 }
 
 // Replace English substrings with French substrings
-function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, script_check, ignore_math, fix_multispace, fix_punct) {
+function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, script_check, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
 	let unmatched_excluding_placeholder = 0;
 	console.log("Unmatched lines (first 100):");
-	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
 	/*
 	============================
-	format en contents and convert to regex
+	format structure and deal with math
 	============================
 	*/
-	// get non-empty contents of math and remove from structure
+	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
+	// remove newlines from math
 	const empty_math = "<math></math>";
 	let no_empty_math_structure = cleaned_structure.replaceAll(empty_math, "");
 	let math_contents = get_tag_contents(no_empty_math_structure, "math");
 	let no_math_structure = rm_tag_contents(no_empty_math_structure, "math");
-	// if option is selected, create list of inline math
-	let inline_math = [];
-	if (ignore_math) {
-		// replace empty math tags with unmatchable string for easier searching, and search for all parent tags of math
-		let no_math_structure_placeholder = no_math_structure.replaceAll(empty_math, unmatchable_string_placeholder);
-		let math_tag_parent_regex = new RegExp(">(([^<]|\n)*?" + unmatchable_string_placeholder + "([^<]|\n)*?)+<", "g");
-		let curr_math_parent_search = math_tag_parent_regex.exec(no_math_structure_placeholder);
-		while (curr_math_parent_search !== null) {
-			// for each math, check if it's inline (has alphanumeric characters outside of math) by replacing math with <>, which can't be matched here
-			let curr_math_parent = curr_math_parent_search[0].replaceAll(unmatchable_string_placeholder, "<>");
-			if (/[a-zA-Z0-9]/g.test(curr_math_parent)) {
-				// if it's inline, add list of contents surrounding math to list
-				let curr_math_parent_text = curr_math_parent.substring(1, curr_math_parent.length - 1).split("<>");
-				curr_math_parent_text = trim_arr(curr_math_parent_text);
-				inline_math.push(curr_math_parent_text);
-			}
-			curr_math_parent_search = math_tag_parent_regex.exec(no_math_structure_placeholder);
+	// if math isn't checked for, leave math removed for now; otherwise, add math without newlines back in
+	if (math_check) {
+		for (let i = 0; i < math_contents.length; i++) {
+			curr_math_content = math_contents[i].replaceAll("\n", "");
+			no_math_structure = no_math_structure.replace(empty_math, curr_math_content);
 		}
 	}
+	// replace math tags with placeholder strings
+	no_math_structure = no_math_structure.replaceAll("<math>", math_open_placeholder);
+	no_math_structure = no_math_structure.replaceAll("</math>", math_close_placeholder);
 	/*
 	============================
 	create multiple structures to keep track of cleaned french
 	============================
 	*/
-	// lines of structure - one to return
+	// one to return
 	let struct_lines = no_math_structure.split("\n");
 	// one to keep track of which lines have been edited
 	let struct_lines_placeholder = no_math_structure.split("\n");
 	// one with superscripts and subscripts that have no internal tags removed
 	let struct_lines_no_script = no_math_structure.replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1").split("\n");
+	// one with math removed
+	let math_placeholder_regex = new RegExp(math_open_placeholder + "(.*?)" + math_close_placeholder, "g");
+	let struct_lines_no_math = no_math_structure.replaceAll(math_placeholder_regex, "").split("\n");
+	// one with math reduced to its values
+	let struct_lines_reduced_math = no_math_structure.replaceAll(math_placeholder_regex, function(match, capture) {
+		return extract_mi_str(capture);
+	}).split("\n");
+	// Note that the last three structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic, but ideally they're rare enough edge cases that it shouldn't be a big deal
 	/*
 	============================
 	format en contents and convert to regex
@@ -185,7 +206,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		content_len.push({position: i, value: en_contents_regex[i].trim()});
 	}
 	content_len.sort(compare_content_len);
-	console.log(content_len)
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
 		let posn = content_len[i].position;
@@ -275,6 +295,22 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		/*
 		============================
+		disregard spacing
+		============================
+		*/
+		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *") + "( *($|<))", "gi");
+		if (curr_content.length >= min_cont_len) {
+			// check for match after spacing is disregarded
+			content_ind = regex_ind(struct_lines_placeholder, space_match);
+			// if match is found, change structure value and set struct counter
+			if (content_ind > -1) {
+				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
+			}
+		}
+		/*
+		============================
 		remove superscripts and subscripts
 		============================
 		*/
@@ -306,18 +342,42 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		/*
 		============================
-		disregard spacing
+		remove math
 		============================
 		*/
-		if (curr_content.length >= min_cont_len) {
-			// check for match after spacing is disregarded
-			let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *") + "( *($|<))", "gi");
-			content_ind = regex_ind(struct_lines_placeholder, space_match);
+		// if option is selected, check for match after math is removed
+		if (math_check) {
+			content_ind = regex_ind(struct_lines_no_math, newline_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
-				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
-				continue;
+				// make sure match is actually because of a math tag
+				if (struct_lines[content_ind].includes(math_open_placeholder)) {
+					// get math tags and move them to the front
+					let math_tags = extract_math_tags(struct_lines[content_ind]);
+					struct_lines[content_ind] = math_tags + struct_lines_no_math[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
+					struct_lines_placeholder[content_ind] = struct_lines_no_math[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					continue;
+				}
+			}
+		}
+		/*
+		============================
+		reduce math to values
+		============================
+		*/
+		// if option is selected, check for match after math is removed
+		if (math_check) {
+			content_ind = regex_ind(struct_lines_reduced_math, space_match);
+			// if match is found, change structure value and set struct counter
+			if (content_ind > -1) {
+				// make sure match is actually because of a math tag
+				if (struct_lines[content_ind].includes(math_open_placeholder)) {
+					// get math tags and move them to the front
+					let math_tags = extract_math_tags(struct_lines[content_ind]);
+					struct_lines[content_ind] = math_tags + struct_lines_reduced_math[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
+					struct_lines_placeholder[content_ind] = struct_lines_reduced_math[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					continue;
+				}
 			}
 		}
 		/*
@@ -350,30 +410,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				struct_lines[content_ind] = struct_lines[content_ind].replace(word_special_match, "$1" + equiv_fr_content + "$2");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
 				continue;
-			}
-		}
-		/*
-		============================
-		ignore math
-		============================
-		*/
-		// if option is selected, check list of inline math against content
-		if (ignore_math) {
-			for (let i = 0; i < inline_math.length; i++) {
-				let curr_inline_math = inline_math[i];
-				if (all_in_str(curr_inline_math, curr_content_orig)) {
-					// if all values of a piece of inline math are part of this content, search structure for those pieces of inline math instead
-					let inline_math_regex_placeholder = curr_inline_math.join(unmatchable_string_placeholder);
-					let inline_math_regex = replace_regex_chars(inline_math_regex_placeholder).replaceAll(unmatchable_string_placeholder, "(?: |\n)*" + empty_math + "(?: |\n)*");
-					let inline_math_match = new RegExp("(^|[^a-zA-Z0-9])" + inline_math_regex + "($|[^a-zA-Z0-9])", "g");
-					content_ind = regex_ind(struct_lines_placeholder, inline_math_match);
-					// if match is found, change structure value and set struct counter
-					if (content_ind > -1) {
-						struct_lines[content_ind] = struct_lines[content_ind].replace(inline_math_match, "$1" + empty_math.repeat(curr_inline_math.length - 1) + equiv_fr_content + "$2");
-						struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
-						continue;
-					}
-				}
 			}
 		}
 		/*
@@ -422,10 +458,14 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		struct_lines = replace_arr(struct_lines, ": :", ":");
 		struct_lines = replace_arr(struct_lines, "::", ":");
 	}
-	// add math back in
+	// add math tags back in
 	let struct_str = struct_lines.join('\n');
-	for (let i = 0; i < math_contents.length; i++) {
-		struct_str = struct_str.replace(empty_math, math_contents[i]);
+	struct_str = struct_str.replaceAll(math_open_placeholder, "<math>").replaceAll(math_close_placeholder, "</math>");
+	// if option wasn't selected and math was removed, add math back in now
+	if (!math_check) {
+		for (let i = 0; i < math_contents.length; i++) {
+			struct_str = struct_str.replace(empty_math, math_contents[i]);
+		}	
 	}
 	// fix french apostrophes
 	return struct_str.replaceAll("'", "’");

@@ -200,12 +200,18 @@ The tool sorts the english content list into tiers by string length of the conte
 - for example, "bar" will match to "&lt;p>foo bar&lt;/p>"
 3. Full tag/line match once substrings common to list numberings are removed, including "1.", "(1)", and "1-". Currently checks for numeric and roman list numberings; alphabetical list numberings are optional, since false positives are more likely.
 - for example, "1. foo bar" will match to "&lt;p>foo bar&lt;/p>".
-4. Superscript and subscript tags ignored in the new english structure.
-- for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
-5. Spacing differences ignored.
+4. Spacing differences ignored.
 - for example, "foo bar" will match to "&lt;p>foo        bar&lt;/p>".
-6. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
+5. Superscript and subscript tags ignored in the new english structure.
+- for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
+6. Math tags ignored in the structure.
+- for example, "foo bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math bar&lt;/p>".
+7. Math tags reduced to their mi, mo, and mn characters in the structure.
+- for example, "foo x bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math bar&lt;/p>".
+8. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
 - for example, "foo-bar" will match to "&lt;p>foo bar&lt;/p>".
+
+Note that rules 3 to 8 are checked one-by-one and independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and spacing is ignored, then it will not be matched).
 
 The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
 
@@ -226,7 +232,7 @@ French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched
 
 ### Math
 
-In some cases, math in word documents, and the old structures that are pasted from these word documents, is formatted as regular text instead of word equations. On the other hand, in a cleaned html structure, math should ideally be written using mathml for accessibility purposes. This is problematic for two reasons:
+In some cases, math in word documents, and the old structures that are pasted from these word documents, is formatted as regular text or images instead of word equations. On the other hand, in a cleaned html structure, math should ideally be written using mathml for accessibility purposes. This is problematic for two reasons:
 1. Inline math, where the regular text of the content row, as parsed from the old structure, is broken into mathml tags in the cleaned structure, which means that the content won't be matched.
 2. Mathml tags may incorrectly be mapped onto by other content rows and translated instead of a non-mathml tag later in the document, preventing that non-mathml tag from being translated.
 
@@ -238,9 +244,9 @@ In the new English structure, the equation might be converted to mathml for clar
 
 &lt;p>Formula 1: &lt;math>&lt;mi>x&lt;/mi>&lt;mo>+&lt;/mo>&lt;mi>y&lt;/mi>&lt;mo>=&lt;/mo>&lt;mi>z&lt;/mi>&lt;/math>&lt;/p>
 
-The tool has two options for this:
-- Treat mathml tags as strings to match anything inside by replacing them with the regex ".*?". This will stop them from preventing content matches. The equivalent French content will still not have mathml; mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
-- Continue to allow mathml tags to break the matching of the surrounding content (ignoring problem 1), but remove its internal contents for the mapping (to prevent problem 2). If there aren't too many equations in the document, the surrounding content can be manually fixed afterward.
+If the option is selected, the tool attempts to deal with the first issue using rules 6 and 7 [as described above](#part-2), and deals with the second issue by replacing math tags with placeholder strings so that their contents won't be matched like regular tags.
+
+Note that the equivalent French content will still not have mathml; mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
 
 ## Beyond Comparing
 
