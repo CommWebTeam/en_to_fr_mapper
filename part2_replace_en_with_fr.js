@@ -212,7 +212,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	for (i = 0; i < ncontents; i++) {
 		let posn = content_len[i].position;
 		let curr_content = content_len[i].value;
-		let curr_content_regex = new RegExp(curr_content, "g");
 		let curr_content_orig = en_contents_orig[posn].trim();
 		/*
 		============================
@@ -258,7 +257,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		// if match is found, change structure value and set struct counter
 		if (content_ind > -1) {
 			struct_lines[content_ind] = struct_lines[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
-			struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+			struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(newline_match, unmatchable_string_placeholder);
 			continue;
 		}
 		let word_match = new RegExp("(^|[^a-zA-Z0-9])" + curr_content + "($|[^a-zA-Z0-9])", "gi");
@@ -268,7 +267,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(word_match, unmatchable_string_placeholder);
 				continue;
 			}
 		}
@@ -286,7 +285,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(list_match, "$1" + equiv_fr_content + "$4");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(list_match, unmatchable_string_placeholder);
 				continue;
 			}
 			// if alpha list option is selected, check for those as well
@@ -297,7 +296,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				// if match is found, change structure value and set struct counter
 				if (content_ind > -1) {
 					struct_lines[content_ind] = struct_lines[content_ind].replace(alpha_list_match, "$1" + equiv_fr_content + "$4");
-					struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(alpha_list_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -314,7 +313,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(space_match, unmatchable_string_placeholder);
 				continue;
 			}
 		}
@@ -331,7 +330,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				// make sure match is actually because of a sub or sup tag
 				if (/su[bp]>/g.test(struct_lines[content_ind])) {
 					struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(newline_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -343,7 +342,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 					// make sure match is actually because of a sub or sup tag
 					if (/su[bp]>/g.test(struct_lines[content_ind])) {
 							struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
-						struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+						struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(word_match, unmatchable_string_placeholder);
 						continue;
 					}
 				}
@@ -364,7 +363,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 					// get math tags and move them to the front
 					let math_tags = extract_math_tags(struct_lines[content_ind]);
 					struct_lines[content_ind] = math_tags + struct_lines_no_math[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_no_math[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					struct_lines_placeholder[content_ind] = struct_lines_no_math[content_ind].replace(newline_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -384,7 +383,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 					// get math tags and move them to the front
 					let math_tags = extract_math_tags(struct_lines[content_ind]);
 					struct_lines[content_ind] = math_tags + struct_lines_reduced_math[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_reduced_math[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+					struct_lines_placeholder[content_ind] = struct_lines_reduced_math[content_ind].replace(space_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -430,13 +429,12 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		if ((curr_content.length >= min_cont_len) && curr_content.includes("aragraph")) {
 			// replace numbers with generic regex
 			let para_num_match = new RegExp("((^|>) *)" + curr_content.replaceAll(/[0-9]+/g, "[0-9]+") + "( *($|<))", "gi");
-			console.log(para_num_match)
 			// check for match after spacing is disregarded
 			content_ind = regex_ind(struct_lines_placeholder, para_num_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				struct_lines[content_ind] = struct_lines[content_ind].replace(para_num_match, "$1" + equiv_fr_content + "$3");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(para_num_match, unmatchable_string_placeholder);
 				continue;
 			}
 		}
