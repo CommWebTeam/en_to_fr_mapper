@@ -66,6 +66,7 @@ function extract_mi_str(math_html_str) {
 
 // extract placeholder math tags from html string
 function extract_math_tags(html_str) {
+	// remove all values that aren't inside math tags
 	init_non_math = new RegExp("^.*?" + math_open_placeholder, "g");
 	middle_non_math = new RegExp(math_close_placeholder + ".*?" + math_open_placeholder, "g");
 	end_non_math =  new RegExp("^(.*" + math_close_placeholder + ").*$", "g");
@@ -373,7 +374,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		reduce math to values
 		============================
 		*/
-		// if option is selected, check for match after math is removed
+		// if option is selected, check for match after math is reduced to its values
 		if (math_check) {
 			content_ind = regex_ind(struct_lines_reduced_math, space_match);
 			// if match is found, change structure value and set struct counter
@@ -422,10 +423,29 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		/*
 		============================
+		ignore paragraph numbers
+		============================
+		*/
+		// content has to be a minimum length and include the keyword "paragraph"
+		if ((curr_content.length >= min_cont_len) && curr_content.includes("aragraph")) {
+			// replace numbers with generic regex
+			let para_num_match = new RegExp("((^|>) *)" + curr_content.replaceAll(/[0-9]+/g, "[0-9]+") + "( *($|<))", "gi");
+			console.log(para_num_match)
+			// check for match after spacing is disregarded
+			content_ind = regex_ind(struct_lines_placeholder, para_num_match);
+			// if match is found, change structure value and set struct counter
+			if (content_ind > -1) {
+				struct_lines[content_ind] = struct_lines[content_ind].replace(para_num_match, "$1" + equiv_fr_content + "$3");
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(curr_content_regex, unmatchable_string_placeholder);
+				continue;
+			}
+		}
+		/*
+		============================
 		Debug
 		============================
 		*/
-		// if match is found, change structure value and set struct counter
+		// counter for number of unmatched lines
 		if (content_ind === -1) {
 			if (unmatched_lines < 100) {
 				console.log(posn + 1);
