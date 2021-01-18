@@ -219,13 +219,15 @@ The tool sorts the english content list into tiers by string length of the conte
 5. Superscript and subscript tags ignored in the new english structure.
 - for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
 6. Math tags ignored in the structure.
-- for example, "foo bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math bar&lt;/p>".
+- for example, "foo bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math> bar&lt;/p>".
 7. Math tags reduced to their mi, mo, and mn characters in the structure.
-- for example, "foo x bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math bar&lt;/p>".
+- for example, "foo x bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math> bar&lt;/p>".
 8. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
 - for example, "foo-bar" will match to "&lt;p>foo bar&lt;/p>".
+9. If the line or tag contains the substring "aragraph" (for "paragraph" / "Paragraph"), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
+- for example, "paragraph 234" will match to "&lt;p>paragraph 8&lt;/p>".
 
-Note that rules 3 to 8 are checked one-by-one and independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and spacing is ignored, then it will not be matched).
+Note that rules 3 to 9 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences.
 
 The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
 
