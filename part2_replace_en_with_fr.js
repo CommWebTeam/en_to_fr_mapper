@@ -327,10 +327,11 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			content_ind = regex_ind(struct_lines_no_script, newline_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
+				let curr_line_no_script = struct_lines[content_ind].replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1");
 				// make sure match is actually because of a sub or sup tag
 				if (/su[bp]>/g.test(struct_lines[content_ind])) {
-					struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(newline_match, unmatchable_string_placeholder);
+					struct_lines[content_ind] = script_notify + curr_line_no_script.replace(newline_match, "$1" + equiv_fr_content + "$3");
+					struct_lines_placeholder[content_ind] = curr_line_no_script.replace(newline_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -339,10 +340,11 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				content_ind = regex_ind(struct_lines_no_script, word_match);
 				// if match is found, change structure value and set struct counter
 				if (content_ind > -1) {
+					let curr_line_no_script = struct_lines[content_ind].replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1");
 					// make sure match is actually because of a sub or sup tag
 					if (/su[bp]>/g.test(struct_lines[content_ind])) {
-							struct_lines[content_ind] = script_notify + struct_lines_no_script[content_ind].replace(word_match, "$1" + equiv_fr_content + "$2");
-						struct_lines_placeholder[content_ind] = struct_lines_no_script[content_ind].replace(word_match, unmatchable_string_placeholder);
+							struct_lines[content_ind] = script_notify + curr_line_no_script.replace(word_match, "$1" + equiv_fr_content + "$2");
+						struct_lines_placeholder[content_ind] = curr_line_no_script.replace(word_match, unmatchable_string_placeholder);
 						continue;
 					}
 				}
@@ -358,12 +360,13 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			content_ind = regex_ind(struct_lines_no_math, newline_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
+				let curr_line_no_math = struct_lines[content_ind].replaceAll(math_placeholder_regex, "");
 				// make sure match is actually because of a math tag
 				if (struct_lines[content_ind].includes(math_open_placeholder)) {
 					// get math tags and move them to the front
 					let math_tags = extract_math_tags(struct_lines[content_ind]);
-					struct_lines[content_ind] = math_tags + struct_lines_no_math[content_ind].replace(newline_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_no_math[content_ind].replace(newline_match, unmatchable_string_placeholder);
+					struct_lines[content_ind] = math_tags + curr_line_no_math.replace(newline_match, "$1" + equiv_fr_content + "$3");
+					struct_lines_placeholder[content_ind] = curr_line_no_math.replace(newline_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
@@ -378,12 +381,15 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			content_ind = regex_ind(struct_lines_reduced_math, space_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
+				let curr_line_reduced_math = struct_lines[content_ind].replaceAll(math_placeholder_regex, function(match, capture) {
+					return extract_mi_str(capture);
+				})
 				// make sure match is actually because of a math tag
 				if (struct_lines[content_ind].includes(math_open_placeholder)) {
 					// get math tags and move them to the front
 					let math_tags = extract_math_tags(struct_lines[content_ind]);
-					struct_lines[content_ind] = math_tags + struct_lines_reduced_math[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = struct_lines_reduced_math[content_ind].replace(space_match, unmatchable_string_placeholder);
+					struct_lines[content_ind] = math_tags + curr_line_reduced_math.replace(space_match, "$1" + equiv_fr_content + "$3");
+					struct_lines_placeholder[content_ind] = curr_line_reduced_math.replace(space_match, unmatchable_string_placeholder);
 					continue;
 				}
 			}
