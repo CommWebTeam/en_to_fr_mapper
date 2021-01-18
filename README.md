@@ -242,7 +242,7 @@ After this, English links to the OSFI website and English WET footnotes are conv
 ### Potential extra step: manually adding in superscripts and subscripts
 Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.
 
-One of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
+[As described above](#part-2), one of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
 
 French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts.
 
@@ -260,9 +260,9 @@ In the new English structure, the equation might be converted to mathml for clar
 
 &lt;p>Formula 1: &lt;math>&lt;mi>x&lt;/mi>&lt;mo>+&lt;/mo>&lt;mi>y&lt;/mi>&lt;mo>=&lt;/mo>&lt;mi>z&lt;/mi>&lt;/math>&lt;/p>
 
-If the option is selected, the tool attempts to deal with the first issue using rules 6 and 7 [as described above](#part-2), and deals with the second issue by replacing math tags with placeholder strings so that their contents won't be matched like regular tags.
+If the option is selected, the tool attempts to deal with the first issue using rules 6 and 7 [as described above](#part-2), and deals with the second issue by replacing math tags with placeholder strings during the rest of the script so that their contents won't be matched like regular tags.
 
-Note that the equivalent French content will still not have mathml; mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
+Note that the equivalent French content will still not have mathml. Similarly to SUPERSCRIPTORSUBSCRIPT being added to the front of lines with superscripts/subscripts, mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
 
 ## Beyond Comparing
 
