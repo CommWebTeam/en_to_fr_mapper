@@ -3,7 +3,13 @@ const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
 const script_notify = "SUPERSCRIPTORSUBSCRIPT";
+
 const marker_placeholder_part2 = "HEADERMARKERPLACEHOLDER";
+const footnote_marker_part2 = "==FOOTNOTE-HERE=="
+const italic_open_marker_part2 = "{ITALICS-OPEN}"
+const italic_close_marker_part2 = "{ITALICS-CLOSE}"
+const bold_open_marker_part2 = "{BOLD-OPEN}"
+const bold_close_marker_part2 = "{BOLD-CLOSE}"
 
 /*
 =================================
@@ -34,9 +40,9 @@ function create_fr_html() {
 	let file_reader_en_struct = new FileReader();
 	let struct_str_en = document.getElementById("cleaned_en").files[0];
 	file_reader_en_struct.onload = function(event) {
-		// read in english and french contents
-		const en_contents = content_inputs[0].split("\n");
-		const fr_contents = content_inputs[1].split("\n");
+		// read in english and french contents, removing markers from part 1
+		const en_contents = content_inputs[0].replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "").split("\n");
+		const fr_contents = content_inputs[1].replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "").split("\n");
 		// read in english structure
 		let structure = replace_special_chars(event.target.result);
 		structure = rm_extra_space(structure);

@@ -1,4 +1,9 @@
 const marker_placeholder = "HEADERMARKERPLACEHOLDER"
+const footnote_marker = "==FOOTNOTE-HERE=="
+const italic_open_marker = "{ITALICS-OPEN}"
+const italic_close_marker = "{ITALICS-CLOSE}"
+const bold_open_marker = "{BOLD-OPEN}"
+const bold_close_marker = "{BOLD-CLOSE}"
 
 /*
 =================================
@@ -59,6 +64,14 @@ function strip_html(html_str, insert_markers) {
 	// join consecutive bold and italics
 	html_arr = html_arr.map(x => x.replaceAll(/<\/em>( *)<em>/g, "$1"));
 	html_arr = html_arr.map(x => x.replaceAll(/<\/strong>( *)<strong>/g, "$1"));
+	// add placeholders for footnotes, italics, and bold
+	if (insert_markers) {
+		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, footnote_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<em>/g, italic_open_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<\/em>/g, italic_close_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<strong>/g, bold_open_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<\/strong>/g, bold_close_marker));
+	}
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
 	// make spacings consistent
