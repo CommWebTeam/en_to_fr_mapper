@@ -64,18 +64,7 @@ function strip_html(html_str, insert_markers) {
 	// make spacings consistent
 	html_arr = html_arr.map(rm_extra_space);
 	// get rid of tags
-	html_arr = html_arr.map(rm_tags_all);
-	// remove indents, list numberings, and empty lines
-	html_arr = trim_arr(html_arr);
-	html_arr = html_arr.map(rm_list);
-	html_arr = rm_empty_lines(html_arr);
-	html_arr = trim_arr(html_arr);
-	// join array back into string and split it again to get actual list
-	html_str_cleaned = html_arr.join('\n');
-	html_arr = html_str_cleaned.split('\n');
-	// remove empty lines
-	html_arr = trim_arr(html_arr);
-	html_arr = rm_empty_lines(html_arr);
+	html_arr = rm_tags(html_arr);
 	// print number of elements in array
 	console.log("Number of elements: " + html_arr.length);
 	return html_arr.join('\n');
