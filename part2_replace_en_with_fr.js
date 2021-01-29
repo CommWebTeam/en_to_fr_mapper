@@ -1,4 +1,4 @@
-const unmatchable_string_emptyline = "EMPTYLINEFILLER123456789";
+const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
@@ -41,8 +41,8 @@ function create_fr_html() {
 	let struct_str_en = document.getElementById("cleaned_en").files[0];
 	file_reader_en_struct.onload = function(event) {
 		// read in english and french contents, removing markers from part 1
-		const en_contents = content_inputs[0].replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "").split("\n");
-		const fr_contents = content_inputs[1].replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "").split("\n");
+		const en_contents = get_content_array(content_inputs[0]);
+		const fr_contents = get_content_array(content_inputs[1]);
 		// read in english structure
 		let structure = replace_special_chars(event.target.result);
 		structure = rm_extra_space(structure);
@@ -57,6 +57,21 @@ function create_fr_html() {
 }
 
 /* Helper functions */
+
+// convert string of contents into an array, removing markers/empty lines
+function get_content_array(html_str) {
+	// remove markers
+	let html_str_no_markers = html_str.replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "");
+	const header_markers_regex = new RegExp("[0-9]+" + marker_placeholder_part2 + "[0-9]+", "g");
+	html_str_no_markers = html_str_no_markers.replaceAll(header_markers_regex, "");
+	// split into array
+	let html_arr = html_str_no_markers.split("\n");
+	// remove extra characters
+	html_arr = trim_arr(html_arr);
+	html_arr = html_arr.map(rm_extra_space);
+	// replace empty array elements
+	return replace_empty_lines(html_arr, empty_line_placeholder);
+}
 
 // extract mi, mo, mn from math
 function extract_mi_str(math_html_str) {
@@ -147,7 +162,6 @@ function compare_content_len(a, b) {
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, script_check, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
-	let unmatched_excluding_placeholder = 0;
 	console.log("Unmatched lines (first 100):");
 	/*
 	============================
@@ -194,13 +208,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	format en contents and convert to regex
 	============================
 	*/
-	// replace inconsistent chars
-	let en_contents_orig = en_contents.map(replace_special_chars);
-	en_contents_orig = en_contents_orig.map(rm_extra_space);
-	en_contents_orig = en_contents_orig.map(x => x.replaceAll(/^ *(&nbsp;)* *$/g, ""));
-	// replace blank lines with some unmatchable string to exclude from regex
-	en_contents_orig = replace_empty_lines(en_contents_orig, unmatchable_string_emptyline);
 	// reformat regex chars
+	let en_contents_orig = en_contents.map(replace_special_chars);
 	let en_contents_regex = en_contents_orig.map(replace_regex_chars);
 	// make nbsp optional
 	en_contents_regex = en_contents_regex.map(x => x.replaceAll("&nbsp;", "(?:&nbsp;)* *"));
@@ -285,8 +294,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		// only assume it's a list value if there are letters
 		if (/[a-zA-Z]/g.test(curr_content) && (curr_content.length >= min_cont_len)) {
 			// check for match after each list numbering formatting is removed
-			let content_no_list = curr_content.replace(/^(\\\([0-9Ii]*\\\) *)*/g, "").replace(/^([0-9Ii]*\\\.[0-9Ii]* *)*/g, "").replace(/^([0-9Ii]*-[0-9Ii]* *)/g, "");
-			let list_match = new RegExp("((^|>) *)(\\(*[0-9Ii]*[\\.\\)-][0-9Ii]* *)*" + content_no_list + "( *($|<))", "gi");
+			let content_no_list = curr_content.replace(/^(\\\([0-9IiVv]*\\\) *)*/g, "").replace(/^([0-9IiVv]*\\\.[0-9IiVv]* *)*/g, "").replace(/^([0-9IiVv]*-[0-9IiVv]* *)/g, "");
+			let list_match = new RegExp("((^|>) *)(\\(*[0-9IiVv]*[\\.\\)-][0-9IiVv]* *)*" + content_no_list + "( *($|<))", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, list_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
@@ -456,20 +465,15 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		============================
 		*/
 		// counter for number of unmatched lines
-		if (content_ind === -1) {
+		if (content_ind === -1 && curr_content !== empty_line_placeholder) {
 			if (unmatched_lines < 100) {
-				console.log(posn + 1);
+				console.log(posn);
 			}
 			unmatched_lines++;
-			if (curr_content !== unmatchable_string_emptyline && !curr_content.includes(marker_placeholder_part2)) {
-				unmatched_excluding_placeholder++;
-			}
 		}
 	}
 	console.log("Total unmatched lines:");
 	console.log(unmatched_lines);
-	console.log("Unmatched lines excluding placeholders:");
-	console.log(unmatched_excluding_placeholder);
 	// translate english link formattings
 	struct_lines = replace_arr(struct_lines, "/eng/", "/fra/");
 	struct_lines = replace_arr(struct_lines, "/Eng/", "/Fra/");

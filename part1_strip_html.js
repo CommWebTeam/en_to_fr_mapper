@@ -66,11 +66,11 @@ function strip_html(html_str, insert_markers) {
 	html_arr = html_arr.map(x => x.replaceAll(/<\/strong>( *)<strong>/g, "$1"));
 	// add placeholders for footnotes, italics, and bold
 	if (insert_markers) {
-		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, footnote_marker));
-		html_arr = html_arr.map(x => x.replaceAll(/<em>/g, italic_open_marker));
-		html_arr = html_arr.map(x => x.replaceAll(/<\/em>/g, italic_close_marker));
-		html_arr = html_arr.map(x => x.replaceAll(/<strong>/g, bold_open_marker));
-		html_arr = html_arr.map(x => x.replaceAll(/<\/strong>/g, bold_close_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, "\n" + footnote_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<em>/g, "\n" + italic_open_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<\/em>/g, "\n" + italic_close_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<strong>/g, "\n" + bold_open_marker));
+		html_arr = html_arr.map(x => x.replaceAll(/<\/strong>/g, "\n" + bold_close_marker));
 	}
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);

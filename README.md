@@ -13,6 +13,7 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - - [Extra English tags](#extra-tag-in-the-english-document)
 - - - - [Extra French tags](#extra-tag-in-the-french-document)
 - - - - [Scanning for differences](#scanning-for-differences)
+- - - - [Markers](#markers)
 - - [Part 2](#part-2)
 - - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
 - - - [Math](#math)
@@ -200,9 +201,17 @@ The French list has two extra rows because the translation of "Cretaceous period
 
 Outside of comparing content lengths, other quick visual inspections are useful too. For example, if both the English and French lists have alpha list numberings (a. b. c. and so on) for some rows, then those list numberings should probably align.
 
-I have also included an option that, if selected, adds a content row above the headers that consists of placeholder string, HEADERMARKERPLACEHOLDER, and a counter. If the headers are the same in both the original English and French structures, then these placeholder strings should align once the rest of the contents have been properly aligned. This is intended to make it easier to immediately see how many content rows apart the English and French versions have been misaligned by looking at how far apart the corresponding placeholder strings are. Since the counter is simply on the number of headers in the document, this only works properly if the number of headers are exactly the same and represent exactly the same positions between the English and French structures - if not, I don't recommend using this option. The placeholder strings will be automatically removed in part 2.
-
 Again, if you are using Beyond Compare, I recommend reloading after every edit so that the rows are always aligned correctly by index; this makes visual inspections like these much easier to perform.
+
+#### Markers
+
+I have included an option that, if selected, adds markers to aid in scanning for where misalignments are occurring:
+
+- A marker is added in the a content row above the headers that consists of placeholder string, HEADERMARKERPLACEHOLDER, and a counter. If the headers are the same in both the original English and French structures, then these placeholder strings should align once the rest of the contents have been properly aligned. This is intended to make it easier to immediately see how many content rows apart the English and French versions have been misaligned by looking at how far apart the corresponding placeholder strings are. Since the counter is simply on the number of headers in the document, this only works properly if the number of headers are exactly the same and represent exactly the same positions between the English and French structures - if not, I don't recommend using this option.
+- The marker ==FOOTNOTE-HERE== is added in positions where footnotes would be.
+- The markers {ITALICS-OPEN}, {ITALICS-CLOSE}, {BOLD-OPEN}, and {BOLD-CLOSE} are added for opening / closing italics and bold tags.
+
+These markers are automatically removed in part 2.
 
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
