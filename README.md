@@ -24,9 +24,9 @@ This was originally intended to be used with word documents pasted into Dreamwea
 We usually work with both english and french translations of the same document, and ideally, the structures of their word documents should be the same. The intention of this tool is for the user to only have to manually clean the english translation of the document to standards; the tool can then do most of the work for creating a cleaned french translation of the document.
 
 Input:
-- the french html document with the old structure
+- the french html document with the old structure (the word document pasted into Dreamweaver)
 - the equivalent english html document with the old structure
-- the same english html document with the new structure
+- the same english html document with the new, manually cleaned structure
 
 Output:
 - the french html document with the new structure
