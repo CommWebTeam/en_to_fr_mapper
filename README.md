@@ -31,7 +31,9 @@ Input:
 Output:
 - the french html document with the new structure
 
-Using this tool is broken into two parts. In short, the first part creates two lists of contents from the old structure, one for the English contents and one for the French contents. The second part searches for each English content in the new (English) structure and replaces it with the equivalent French content by index.
+Using this tool is broken into two parts. In short:
+1. the first part creates two lists of contents from the old structure, one for the English contents and one for the French contents.
+2. The second part searches for each English content in the new (English) structure, and replaces it with the equivalent French content by index.
 
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
