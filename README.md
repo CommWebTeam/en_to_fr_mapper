@@ -209,7 +209,6 @@ Again, if you are using Beyond Compare, I recommend reloading after every edit s
 
 I have included an option that, if selected, adds markers to aid in scanning for where misalignments are occurring:
 
-- A marker is added in the a content row above the headers that consists of placeholder string, HEADERMARKERPLACEHOLDER, and a counter. If the headers are the same in both the original English and French structures, then these placeholder strings should align once the rest of the contents have been properly aligned. This is intended to make it easier to immediately see how many content rows apart the English and French versions have been misaligned by looking at how far apart the corresponding placeholder strings are. Since the counter is simply on the number of headers in the document, this only works properly if the number of headers are exactly the same and represent exactly the same positions between the English and French structures - if not, I don't recommend using this option.
 - The marker ==FOOTNOTE-HERE== is added in positions where footnotes would be.
 - The markers {ITALICS-OPEN}, {ITALICS-CLOSE}, {BOLD-OPEN}, and {BOLD-CLOSE} are added for opening / closing italics and bold tags.
 
