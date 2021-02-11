@@ -43,17 +43,6 @@ function create_content_lists() {
 function strip_html(html_str, insert_markers) {
 	// if option is selected, insert markers in front of headers
 	let header_html_str = html_str.replaceAll("\r\n", "\n");
-	if (insert_markers) {
-		const header_regex = /(<h[0-9]+)/g;
-		let num_headers = count_regex(html_str, header_regex);
-		console.log("Number of headers: " + num_headers);
-		// newline followed by space indicates untouched header
-		header_html_str = header_html_str.replaceAll(header_regex, "\n $1");
-		// add markers in front of untouched headers one at a time
-		for (let i = 0; i < num_headers; i++) {
-			header_html_str = header_html_str.replace(/(\n )+(<h[0-9]+)/g, "\n" + i + marker_placeholder + i + "$2");
-		}
-	}
 	let html_arr = header_html_str.split('\n');
 	// remove first few lines of html file
 	html_arr = html_arr.slice(6, html_arr.length);
