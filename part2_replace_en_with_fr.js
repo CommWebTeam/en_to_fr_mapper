@@ -45,7 +45,7 @@ function create_fr_html() {
 		const fr_contents = get_content_array(content_inputs[1]);
 		// read in english structure
 		let structure = replace_special_chars(event.target.result);
-		structure = rm_extra_space(structure);
+		structure = format_spacing(structure);
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
 		// replace english content in structure with french content
@@ -68,7 +68,7 @@ function get_content_array(html_str) {
 	let html_arr = html_str_no_markers.split("\n");
 	// remove extra characters
 	html_arr = trim_arr(html_arr);
-	html_arr = html_arr.map(rm_extra_space);
+	html_arr = html_arr.map(format_spacing);
 	// replace empty array elements
 	return replace_empty_lines(html_arr, empty_line_placeholder);
 }
@@ -210,7 +210,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	*/
 	// reformat regex chars
 	let en_contents_orig = en_contents.map(replace_special_chars);
-	let en_contents_regex = en_contents_orig.map(replace_regex_chars);
+	let en_contents_regex = en_contents_orig.map(escape_regex_chars);
 	// make nbsp optional
 	en_contents_regex = en_contents_regex.map(x => x.replaceAll("&nbsp;", "(?:&nbsp;)* *"));
 	/*

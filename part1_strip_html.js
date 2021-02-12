@@ -64,7 +64,7 @@ function strip_html(html_str, insert_markers) {
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
 	// make spacings consistent
-	html_arr = html_arr.map(rm_extra_space);
+	html_arr = html_arr.map(format_spacing);
 	// get rid of tags
 	html_arr = rm_tags(html_arr);
 	// print number of elements in array
