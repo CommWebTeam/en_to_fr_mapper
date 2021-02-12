@@ -278,4 +278,4 @@ Note that the equivalent French content will still not have mathml. Similarly to
 
 Since there are numerous edge cases where values may be swapped or not correctly mapped, a manual inspection should be done on the French document afterwards. 
 
-One common issue with the mapper is that punctuation differences between English and French contents (e.g. a period is bolded in the English version only) may result in duplicate / missing punctuation or spacing, so if the option isn't selected, it could be worth manually searching for strings like *" ."*, *" ,"*, *".."*, and *". ."* to remove first.
+One common issue with the mapper is that punctuation differences between English and French contents (e.g. a period is bolded in the English version only) may result in duplicate / missing punctuation or spacing, so if the option isn't selected, it could be worth manually searching for regex strings like *" ."*, *" ,"*, *".."*, and *". ."* to remove first.

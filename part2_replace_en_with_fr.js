@@ -474,13 +474,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	}
 	console.log("Total unmatched lines:");
 	console.log(unmatched_lines);
-	// translate english link formattings
-	struct_lines = replace_arr(struct_lines, "/eng/", "/fra/");
-	struct_lines = replace_arr(struct_lines, "/Eng/", "/Fra/");
-	// translate english footnotes
-	struct_lines = replace_arr(struct_lines, "Return to footnote", "Retour à la référence de la note de bas de page");
-	struct_lines = replace_arr(struct_lines, "Footnotes", "Notes de bas de page");
-	struct_lines = replace_arr(struct_lines, "Footnote", "Note de bas de page");
+	// translate english link formattings and footnotes using basic_format function
+	struct_lines = struct_lines.map(translate_to_fr);
 	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
 	// fix multispace if selected
 	if (fix_multispace) {

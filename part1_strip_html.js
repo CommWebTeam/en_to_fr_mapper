@@ -41,19 +41,17 @@ function create_content_lists() {
 
 // formats html file and strips all of its tags to create a list of content values
 function strip_html(html_str, insert_markers) {
-	// if option is selected, insert markers in front of headers
-	let header_html_str = html_str.replaceAll("\r\n", "\n");
-	let html_arr = header_html_str.split('\n');
+	// remove windows newlines
+	let clean_html_str = html_str.replaceAll("\r\n", "\n");
+	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
+	clean_html_str = remove_ref_links(clean_html_str);
+	clean_html_str = remove_toc_links(clean_html_str);
+	clean_html_str = remove_logiterms(clean_html_str);
+	clean_html_str = join_em_strong(clean_html_str);
 	// remove first few lines of html file
+	let html_arr = clean_html_str.split('\n');
 	html_arr = html_arr.slice(6, html_arr.length);
-	// remove logiterms, ref links, toc links
-	html_arr = html_arr.map(x => x.replaceAll(/<a name="lt_[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
-	html_arr = html_arr.map(x => x.replaceAll(/<a name="_Ref[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
-	html_arr = html_arr.map(x => x.replaceAll(/<a name="_Toc[a-zA-z0-9]+">(.*?)<\/a>/g, "$1"));
-	// join consecutive bold and italics
-	html_arr = html_arr.map(x => x.replaceAll(/<\/em>( *)<em>/g, "$1"));
-	html_arr = html_arr.map(x => x.replaceAll(/<\/strong>( *)<strong>/g, "$1"));
-	// add placeholders for footnotes, italics, and bold
+	// add placeholders for footnotes, italics, and bold if option is selected
 	if (insert_markers) {
 		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, "\n" + footnote_marker));
 		html_arr = html_arr.map(x => x.replaceAll(/<em>/g, "\n" + italic_open_marker));
