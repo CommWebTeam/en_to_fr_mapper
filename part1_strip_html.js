@@ -48,6 +48,8 @@ function strip_html(html_str, insert_markers) {
 	clean_html_str = remove_toc_links(clean_html_str);
 	clean_html_str = remove_logiterms(clean_html_str);
 	clean_html_str = join_em_strong(clean_html_str);
+	clean_html_str = fix_fake_scripts(clean_html_str);
+	clean_html_str = fix_fake_math(clean_html_str);
 	// remove first few lines of html file
 	let html_arr = clean_html_str.split('\n');
 	html_arr = html_arr.slice(6, html_arr.length);
