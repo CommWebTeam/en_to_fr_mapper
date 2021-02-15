@@ -2,7 +2,6 @@ const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
-const script_notify = "SUPERSCRIPTORSUBSCRIPT";
 
 const marker_placeholder_part2 = "HEADERMARKERPLACEHOLDER";
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
@@ -49,7 +48,7 @@ function create_fr_html() {
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
 		// replace english content in structure with french content
-		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("script_check").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked);
+		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked);
 		// download structure with french content
 		download(new_structure, "fr_html.html", "text/html");
 	}
@@ -159,7 +158,7 @@ function compare_content_len(a, b) {
 }
 
 // Replace English substrings with French substrings
-function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, script_check, math_check, fix_multispace, fix_punct) {
+function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
 	console.log("Unmatched lines (first 100):");
@@ -193,8 +192,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	let struct_lines = no_math_structure.split("\n");
 	// one to keep track of which lines have been edited
 	let struct_lines_placeholder = no_math_structure.split("\n");
-	// one with superscripts and subscripts that have no internal tags removed
-	let struct_lines_no_script = no_math_structure.replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1").split("\n");
 	// one with math removed
 	let math_placeholder_regex = new RegExp(math_open_placeholder + "(.*?)" + math_close_placeholder, "g");
 	let struct_lines_no_math = no_math_structure.replaceAll(math_placeholder_regex, "").split("\n");
@@ -330,39 +327,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(space_match, unmatchable_string_placeholder);
 				continue;
-			}
-		}
-		/*
-		============================
-		remove superscripts and subscripts
-		============================
-		*/
-		// if option is selected, check for match after sup and sub tags are removed
-		if (script_check) {
-			content_ind = regex_ind(struct_lines_no_script, newline_match);
-			// if match is found, change structure value and set struct counter
-			if (content_ind > -1) {
-				let curr_line_no_script = struct_lines[content_ind].replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1");
-				// make sure match is actually because of a sub or sup tag
-				if (/su[bp]>/g.test(struct_lines[content_ind])) {
-					struct_lines[content_ind] = script_notify + curr_line_no_script.replace(newline_match, "$1" + equiv_fr_content + "$3");
-					struct_lines_placeholder[content_ind] = curr_line_no_script.replace(newline_match, unmatchable_string_placeholder);
-					continue;
-				}
-			}
-			// also check for partial matches
-			if (curr_content.length >= min_cont_len) {
-				content_ind = regex_ind(struct_lines_no_script, word_match);
-				// if match is found, change structure value and set struct counter
-				if (content_ind > -1) {
-					let curr_line_no_script = struct_lines[content_ind].replaceAll(/<su[bp]>([^<]*?)<\/su[bp]>/g, "$1");
-					// make sure match is actually because of a sub or sup tag
-					if (/su[bp]>/g.test(struct_lines[content_ind])) {
-							struct_lines[content_ind] = script_notify + curr_line_no_script.replace(word_match, "$1" + equiv_fr_content + "$2");
-						struct_lines_placeholder[content_ind] = curr_line_no_script.replace(word_match, unmatchable_string_placeholder);
-						continue;
-					}
-				}
 			}
 		}
 		/*

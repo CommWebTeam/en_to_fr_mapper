@@ -15,7 +15,6 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - - [Scanning for differences](#scanning-for-differences)
 - - - - [Markers](#markers)
 - - [Part 2](#part-2)
-- - - [Manually adding in scripts](#potential-extra-step-manually-adding-in-superscripts-and-subscripts)
 - - - [Math](#math)
 - - [Beyond comparing](#english-to-french-mapper)
 
@@ -38,9 +37,9 @@ Using this tool is broken into two parts. In short:
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
 ## Part 1:
-Extract lists of the english and french contents from the old structures.
+Extract lists of the english and french contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting).
 
-This is mainly done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&lt;/b>z&lt;/p>" creates a list with the following rows:
+This is done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&lt;/b>z&lt;/p>" creates a list with the following rows:
 - x
 - y
 - z
@@ -226,18 +225,16 @@ The tool sorts the english content list into tiers by string length of the conte
 - for example, "1. foo bar" will match to "&lt;p>foo bar&lt;/p>".
 4. Spacing differences ignored.
 - for example, "foo bar" will match to "&lt;p>foo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar&lt;/p>".
-5. Superscript and subscript tags ignored in the new english structure.
-- for example, "foo bar" will match to "&lt;p>foo b&lt;sub>ar&lt;/sub>&lt;/p>".
-6. Math tags ignored in the structure.
+5. Math tags ignored in the structure.
 - for example, "foo bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math> bar&lt;/p>".
-7. Math tags reduced to their mi, mo, and mn characters in the structure.
+6. Math tags reduced to their mi, mo, and mn characters in the structure.
 - for example, "foo x bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math> bar&lt;/p>".
-8. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
+7. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
 - for example, "foo-bar" will match to "&lt;p>foo bar&lt;/p>".
-9. If the line or tag contains the substring "aragraph" (for "paragraph" / "Paragraph"), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
+8. If the line or tag contains the substring "aragraph" (for "paragraph" / "Paragraph"), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
 - for example, "paragraph 234" will match to "&lt;p>paragraph 8&lt;/p>".
 
-Note that rules 3 to 9 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences.
+Note that rules 3 to 8 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences.
 
 The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
 
@@ -249,12 +246,7 @@ To prevent false positives, some of these rules require the content being search
 
 After this, English links to the OSFI website and English WET footnotes are converted into French.
 
-### Potential extra step: manually adding in superscripts and subscripts
-Since Dreamweaver pastes do not distinguish superscripts and subscripts from the original word document, they will not be distinguished in the content lists generated in part 1, either; the user will have to manually add them in when cleaning the document to conform it to WCAG/WET standards.
-
-[As described above](#part-2), one of the rules used in part 2 for finding english contents is to match while ignoring superscripts and subscripts. To mark the tags where this rule is used (rather than one of the earlier rules), the string SUPERSCRIPTORSUBSCRIPT is included in front of the tag. The user should manually search for this keyword and add in superscripts/subscripts at those lines.
-
-French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts.
+French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
 
 ### Math
 
@@ -270,9 +262,9 @@ In the new English structure, the equation might be converted to mathml for clar
 
 &lt;p>Formula 1: &lt;math>&lt;mi>x&lt;/mi>&lt;mo>+&lt;/mo>&lt;mi>y&lt;/mi>&lt;mo>=&lt;/mo>&lt;mi>z&lt;/mi>&lt;/math>&lt;/p>
 
-If the option is selected, the tool attempts to deal with the first issue using rules 6 and 7 [as described above](#part-2), and deals with the second issue by replacing math tags with placeholder strings during the rest of the script so that their contents won't be matched like regular tags.
+If the option is selected, the tool attempts to deal with the first issue using rules 5 and 6 [as described above](#part-2), and deals with the second issue by replacing math tags with placeholder strings during the rest of the script so that their contents won't be matched like regular tags.
 
-Note that the equivalent French content will still not have mathml. Similarly to SUPERSCRIPTORSUBSCRIPT being added to the front of lines with superscripts/subscripts, mathml tags will be shifted to the front of their respective tags and will have to be manually repositioned afterwards.
+Note that since the equivalent French content that was extracted from the old Dreamweaver paste does not have mathml, the tool doesn't know where the math should be positioned after a successful mapping. This check shifts mathml equations to the front of their respective tags, so the user will have to manually search through &lt;math> tags and reposition them afterwards.
 
 ## Beyond Comparing
 
