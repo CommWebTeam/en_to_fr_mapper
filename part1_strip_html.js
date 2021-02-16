@@ -39,10 +39,28 @@ function create_content_lists() {
 
 /* Helper functions */
 
+// replace all closing tags with newlines
+function rm_tags(html_arr) {
+	// get rid of tags
+	new_arr = html_arr.map(x => x.replaceAll(/<.*?>/g, "\n"));
+	// remove indents, list numberings, and empty lines
+    new_arr = trim_arr(new_arr);
+    new_arr = new_arr.map(rm_list);
+	new_arr = rm_empty_lines(new_arr);
+    new_arr = trim_arr(new_arr);
+	// join array back into string and split it again to get actual list
+	html_str_cleaned = new_arr.join('\n');
+    new_arr = html_str_cleaned.split('\n');
+    // remove empty lines
+	new_arr = trim_arr(new_arr);
+    new_arr = rm_empty_lines(new_arr);
+	return new_arr;
+}
+
 // formats html file and strips all of its tags to create a list of content values
 function strip_html(html_str, insert_markers) {
-	// remove windows newlines
-	let clean_html_str = html_str.replaceAll("\r\n", "\n");
+	// make spacings consistent
+	clean_html_str = format_spacing(html_str);
 	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
 	clean_html_str = remove_ref_links(clean_html_str);
 	clean_html_str = remove_toc_links(clean_html_str);
@@ -63,8 +81,6 @@ function strip_html(html_str, insert_markers) {
 	}
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
-	// make spacings consistent
-	html_arr = html_arr.map(format_spacing);
 	// get rid of tags
 	html_arr = rm_tags(html_arr);
 	// print number of elements in array
