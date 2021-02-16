@@ -71,6 +71,8 @@ function strip_html(html_str, insert_markers) {
 	// remove first few lines of html file
 	let html_arr = clean_html_str.split('\n');
 	html_arr = html_arr.slice(6, html_arr.length);
+	// check spacing consistency again
+	html_arr = html_arr.map(format_spacing);
 	// add placeholders for footnotes, italics, and bold if option is selected
 	if (insert_markers) {
 		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, "\n" + footnote_marker));
