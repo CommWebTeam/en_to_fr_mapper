@@ -154,7 +154,7 @@ So the English list can also be written as
 - &lt;oti
 - &lt;/oti
 
-Note that in cases where an extra opening and closing tag in the French document is next to another tag, you should still add two rows in the English content list as above, but also add an extra blank row in the French content list to maintain alignment. For example, if the English document still has the same html as above but the French document has the following html:
+Keep in mind that in cases where an extra opening and closing tag in the French document is next to another tag, you should still add two rows in the English content list as above, but also add an extra blank row in the French content list to maintain alignment. For example, if the English document still has the same html as above but the French document has the following html:
 
 &lt;p>&lt;span class="osfi-txt--italic">y&lt;/span>z&lt;/p>
 
@@ -167,6 +167,8 @@ The English list should still include two extra rows indicating the French tags 
 - 
 - y
 - z
+
+Note that since the "no" shortform for number in English has no superscript, but n<sup>o</sup> in French does, the extra tag would result in the French content list being longer. As such, the tool replaces n<sup>o</sup> in French with a placeholder, "n_cap_sup_o_placeholder", for content alignment; this string is then converted back to n<sup>o</sup> in part 2.
 
 #### Scanning for differences
 

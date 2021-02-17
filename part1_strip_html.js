@@ -1,9 +1,10 @@
-const marker_placeholder = "HEADERMARKERPLACEHOLDER"
 const footnote_marker = "==FOOTNOTE-HERE=="
 const italic_open_marker = "{ITALICS-OPEN}"
 const italic_close_marker = "{ITALICS-CLOSE}"
 const bold_open_marker = "{BOLD-OPEN}"
 const bold_close_marker = "{BOLD-CLOSE}"
+const fr_placeholder_sup_no = "n_sup_o_placeholder"
+const fr_placeholder_sup_no_cap = "n_cap_sup_o_placeholder"
 
 /*
 =================================
@@ -20,7 +21,7 @@ function create_content_lists() {
 	file_reader_en.onload = function(event) {
 		// clean string
 		console.log("English - ");
-		let values_en = strip_html(event.target.result, document.getElementById("insert_markers").checked);
+		let values_en = strip_html(event.target.result, document.getElementById("insert_markers").checked, document.getElementById("remove_br").checked);
 		// download file
 		download(values_en, "en_values.txt", "text/plain");
 	}
@@ -31,7 +32,7 @@ function create_content_lists() {
 	let dirty_fr_file = document.getElementById("dirty_fr").files[0];
 	file_reader_fr.onload = function(event) {
 		console.log("French - ");
-		let values_fr = strip_html(event.target.result, document.getElementById("insert_markers").checked);
+		let values_fr = strip_html(event.target.result, document.getElementById("insert_markers").checked, document.getElementById("remove_br").checked);
 		download(values_fr, "fr_values.txt", "text/plain");
 	}
 	file_reader_fr.readAsText(dirty_fr_file);
@@ -39,28 +40,32 @@ function create_content_lists() {
 
 /* Helper functions */
 
-// replace all closing tags with newlines
-function rm_tags(html_arr) {
-	// get rid of tags
-	new_arr = html_arr.map(x => x.replaceAll(/<.*?>/g, "\n"));
-	// remove indents, list numberings, and empty lines
-    new_arr = trim_arr(new_arr);
-    new_arr = new_arr.map(rm_list);
-	new_arr = rm_empty_lines(new_arr);
-    new_arr = trim_arr(new_arr);
-	// join array back into string and split it again to get actual list
-	html_str_cleaned = new_arr.join('\n');
-    new_arr = html_str_cleaned.split('\n');
-    // remove empty lines
-	new_arr = trim_arr(new_arr);
-    new_arr = rm_empty_lines(new_arr);
-	return new_arr;
-}
-
 // formats html file and strips all of its tags to create a list of content values
-function strip_html(html_str, insert_markers) {
+function strip_html(html_str, insert_markers, remove_br) {
+	/*
+	============================
+	clean dreamweaver document
+	============================
+	*/
 	// make spacings consistent
 	clean_html_str = format_spacing(html_str);
+	// remove br from tables if option is selected
+	if (remove_br) {
+		// remove empty tables
+		clean_html_str = clean_html_str.replaceAll(/<table(.*?)>( |\n)*<\/table>/g, "");
+		// get array of table contents
+		let table_contents = get_tag_contents(clean_html_str, "table");
+		// remove table contents from html
+		clean_html_str = rm_tag_contents(clean_html_str, "table");
+		// add table contents back in with <br> removed
+		for (let i = 0; i < table_contents.length; i++) {
+			let new_table_content = table_contents[i].replaceAll(/( |\n)*<br>( |\n)*/g, " ");
+			clean_html_str = clean_html_str.replace("<table></table>", new_table_content);
+		}
+	}
+	// replace n<sup>o</sup> with a placeholder (since it won't be mapped)
+	clean_html_str = clean_html_str.replaceAll("n&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no);
+	clean_html_str = clean_html_str.replaceAll("N&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no_cap);
 	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
 	clean_html_str = remove_ref_links(clean_html_str);
 	clean_html_str = remove_toc_links(clean_html_str);
@@ -83,9 +88,35 @@ function strip_html(html_str, insert_markers) {
 	}
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
+	/*
+	============================
+	create content list
+	============================
+	*/
 	// get rid of tags
-	html_arr = rm_tags(html_arr);
+	content_arr = html_arr.map(x => x.replaceAll(/<.*?>/g, "\n"));
+	// remove indents, list numberings, and empty lines
+	content_arr = trim_arr(content_arr);
+	content_arr = content_arr.map(rm_list);
+	content_arr = rm_empty_lines(content_arr);
+	content_arr = trim_arr(content_arr);
+	// join array back into string and split it again to get actual list
+	content_arr_str = content_arr.join('\n');
+	content_arr = content_arr_str.split('\n');
+	// remove empty lines
+	content_arr = trim_arr(content_arr);
+	content_arr = rm_empty_lines(content_arr);
+	// get rid of contents that only consist of placeholders
+	if (insert_markers) {
+		for (let i = 0; i < content_arr.length; i++) {
+			if (content_arr[i] === italic_open_marker || content_arr[i] === italic_close_marker ||
+				content_arr[i] === bold_open_marker || content_arr[i] === bold_close_marker) {
+				content_arr[i] = "";
+			}
+		}
+		content_arr = rm_empty_lines(content_arr);
+	}
 	// print number of elements in array
-	console.log("Number of elements: " + html_arr.length);
-	return html_arr.join('\n');
+	console.log("Number of elements: " + content_arr.length);
+	return content_arr.join('\n');
 }

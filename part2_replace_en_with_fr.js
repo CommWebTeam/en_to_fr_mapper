@@ -3,12 +3,13 @@ const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
 
-const marker_placeholder_part2 = "HEADERMARKERPLACEHOLDER";
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
 const italic_open_marker_part2 = "{ITALICS-OPEN}"
 const italic_close_marker_part2 = "{ITALICS-CLOSE}"
 const bold_open_marker_part2 = "{BOLD-OPEN}"
 const bold_close_marker_part2 = "{BOLD-CLOSE}"
+const fr_placeholder_sup_no_part2 = "n_sup_o_placeholder"
+const fr_placeholder_sup_no_cap_part2 = "n_cap_sup_o_placeholder"
 
 /*
 =================================
@@ -61,8 +62,8 @@ function create_fr_html() {
 function get_content_array(html_str) {
 	// remove markers
 	let html_str_no_markers = html_str.replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "");
-	const header_markers_regex = new RegExp("[0-9]+" + marker_placeholder_part2 + "[0-9]+", "g");
-	html_str_no_markers = html_str_no_markers.replaceAll(header_markers_regex, "");
+	// add n<sup>o</sup> back in
+	html_str_no_markers = html_str_no_markers.replaceAll(fr_placeholder_sup_no_part2, "n<sup>o</sup>").replaceAll(fr_placeholder_sup_no_cap_part2, "N<sup>o</sup>");
 	// split into array
 	let html_arr = html_str_no_markers.split("\n");
 	// remove extra characters
@@ -168,15 +169,17 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	============================
 	*/
 	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
-	// remove newlines from math
+	// remove empty math equations
 	const empty_math = "<math></math>";
 	let no_empty_math_structure = cleaned_structure.replaceAll(empty_math, "");
+	// get array of math contents
 	let math_contents = get_tag_contents(no_empty_math_structure, "math");
+	// remove math contents from structure
 	let no_math_structure = rm_tag_contents(no_empty_math_structure, "math");
 	// if math isn't checked for, leave math removed for now; otherwise, add math without newlines back in
 	if (math_check) {
 		for (let i = 0; i < math_contents.length; i++) {
-			curr_math_content = math_contents[i].replaceAll("\n", "");
+			let curr_math_content = math_contents[i].replaceAll("\n", "");
 			no_math_structure = no_math_structure.replace(empty_math, curr_math_content);
 		}
 	}
@@ -199,7 +202,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	let struct_lines_reduced_math = no_math_structure.replaceAll(math_placeholder_regex, function(match, capture) {
 		return extract_mi_str(capture);
 	}).split("\n");
-	// Note that the last three structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic, but ideally they're rare enough edge cases that it shouldn't be a big deal
+	// Note that the last two structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic, but ideally they're rare enough edge cases that it shouldn't be a big deal
 	/*
 	============================
 	format en contents and convert to regex
