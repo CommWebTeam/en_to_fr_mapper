@@ -472,5 +472,5 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}	
 	}
 	// fix french apostrophes
-	return struct_str.replaceAll("'", "’");
+	return struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
 }

@@ -246,7 +246,7 @@ To prevent false positives, some of these rules require the content being search
 
 [English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-french-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
-After this, English links to the OSFI website and English WET footnotes are converted into French.
+After this, English links to the OSFI website and English WET footnotes are converted into French. All apostrophes ' are replaced with ’.
 
 French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
 
