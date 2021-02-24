@@ -137,7 +137,7 @@ function compare_content_len(a, b) {
 	// set all numeric substrings to length 1
 	const a_nonum = a.value.replaceAll(/[0-9]+/g, "1");
 	const b_nonum = b.value.replaceAll(/[0-9]+/g, "1");
-	// sort content indicating an extra tag in the french content to the front
+	// sort content indicating an extra tag (or tag start/end position) in the french content to the front
 	// 1st index will contain "<" (since it's escaped to \<)
 	if (a_nonum[1] === "<" && b_nonum[1] !== "<") {
 		return -1;
@@ -145,7 +145,7 @@ function compare_content_len(a, b) {
 	if (a_nonum[1] !== "<" && b_nonum[1] === "<") {
 		return 1;
 	}
-	// if both contents indicate an extra tag, sort by reverse position (so appending is done in backwards order)
+	// if both contents indicate an extra tag (or tag start/end position), sort by reverse position (so appending is done in reverse order)
 	if (a_nonum[1] === "<" && b_nonum[1] === "<") {
 		return b.position - a.position;
 	}
@@ -202,7 +202,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	let struct_lines_reduced_math = no_math_structure.replaceAll(math_placeholder_regex, function(match, capture) {
 		return extract_mi_str(capture);
 	}).split("\n");
-	// Note that the last two structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic, but ideally they're rare enough edge cases that it shouldn't be a big deal
+	// Note that the two math-related structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic since we don't keep track of when they're edited, but ideally they're rare enough edge cases that it shouldn't be a big deal
 	/*
 	============================
 	format en contents and convert to regex
@@ -235,7 +235,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		// get equivalent french content
 		let equiv_fr_content = fr_contents[posn];
-		// if first character is <, indicating extra french tag, append it to previous content with tags
+		// if first character in english content is <, indicating extra french tag (or differing tag start/end position), append french content at current index with tags to french content at previous index
 		if (curr_content[1] === "<") {
 			let extra_tag = curr_content;
 			// remove escapes
@@ -253,6 +253,12 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			if (extra_tag.slice(-1) !== ">") {
 				extra_tag = extra_tag + ">";
 			}
+			// if extra tag indicates a later start tag in french contents, prepend current french content to next french content instead
+			if (extra_tag[1] === "!" && extra_tag[2] === "l") {
+				fr_contents[posn + 1] = equiv_fr_content + extra_tag + fr_contents[posn + 1];
+				continue;
+			}
+			// otherwise, append current french content to previous french content
 			fr_contents[posn - 1] = fr_contents[posn - 1] + extra_tag + equiv_fr_content;
 			continue;
 		}
@@ -441,6 +447,20 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	}
 	console.log("Total unmatched lines:");
 	console.log(unmatched_lines);
+	/*
+	============================
+	Clean up output
+	============================
+	*/
+	// swap extra french contents resulting from differing tag start/end positions into place, and remove placeholder tags
+	struct_lines = replace_arr(struct_lines, /<!r>(.*?)(<.*?>)/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /<!r1>(.*?)(<.*?>)/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /<!r2>(.*?)(<.*?> *<.*?>)/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /<!r3>(.*?)(<.*?> *<.*?> *<.*?>)/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l>/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l1>/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?>)([^<]*?)<!l2>/g, "$2$1");
+	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?> *<[^<]*?>)([^<]*?)<!l3>/g, "$2$1");
 	// translate english link formattings and footnotes using basic_format function
 	struct_lines = struct_lines.map(translate_to_fr);
 	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
@@ -471,6 +491,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			struct_str = struct_str.replace(empty_math, math_contents[i]);
 		}	
 	}
-	// fix french apostrophes
+	// fix french apostrophes and remove placeholders
 	return struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
 }

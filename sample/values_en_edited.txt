@@ -1,0 +1,4 @@
+start placeholder
+<!l3
+{BOLD-OPEN}abc x
+end placeholder

@@ -60,20 +60,7 @@
   <label for="fix_multispace">Remove multispaces, including any spaces surrounding no break spaces</label>
   <br>
   <input type="checkbox" id="fix_punct" name="fix_punct" checked>
-  <label for="fix_punct">Fix the following incorrect punctuation strings:</label>
-  <ul>
-    <li>". ."</li>
-    <li>" ."</li>
-    <li>".."</li>
-    <li>", ,"</li>
-    <li>" ,"</li>
-    <li>",,"</li>
-    <li>"; ;"</li>
-    <li>" ;"</li>
-    <li>";;"</li>
-    <li>"::"</li>
-    <li>": :"</li>
-  </ul>
+  <label for="fix_punct">Try to fix punctuation spacing issues</label>
   <br>
 </form>
 <p>This tool tries to fill in the wet French document after the wet English document has been manually completed. It works on the assumptions that a) the original (non-wet) documents have similar document structures and b) the wet html documents should have identical structures. With that in mind, it replaces the English values in the wet html document with their equivalent French values.</p>
@@ -91,9 +78,20 @@
     <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by index.</li>
     <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content.
       <ul>
-        <li>If the English document has extra rows of content (tags) that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.</li>
-        <li>If the French document has extra rows of content (tags) that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next, so that the remaining content aligns.</li>
-        <li>If the documents have different tags at the same index but are otherwise aligned, you can treat it as the English document have extra rows followed by the French document having extra rows.</li>
+        <li>If the English document has extra rows of content from having tags that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.</li>
+        <ul>
+          <li>If the English document has extra rows of content from its content coming before or after a tag differently, add blank rows to the French content until their rows align.</li>
+        </ul>
+        <li>If the French document has extra rows of content from having tags that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next row, so that the remaining content aligns.</li>
+        <ul>
+          <li>If the French document has extra rows of content from its content coming before or after a tag differently:
+            <ul>
+              <li>Add a row with the placeholder tag &lt;!r in the English contents to indicate that the equivalent French row should be pushed one tag behind, &lt;!r2 to push it two tags behind, or &lt;!r3 to push it three tags behind.</li>
+              <li>Add a row with the placeholder tag &lt;!l in the English contents to indicate that the equivalent French row should be pushed one tag in front, &lt;!l2 to push it two tags in front, or &lt;!l3 to push it three tags in front.</li>
+            </ul>
+          </li>
+        </ul>
+        <li>If the documents have different tags at the same index but are otherwise aligned, you can treat it as the English document having extra rows followed by the French document having extra rows.</li>
       </ul>
       Some tips if you are using Beyond Compare to align values:
       <ul>

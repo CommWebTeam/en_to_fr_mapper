@@ -12,9 +12,11 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - [Aligning values](#english-to-french-mapper)
 - - - - [Extra English tags](#extra-tag-in-the-english-document)
 - - - - [Extra French tags](#extra-tag-in-the-french-document)
+- - - - [Extra French tags](#extra-tag-in-the-french-document)
 - - - - [Scanning for differences](#scanning-for-differences)
 - - - - [Markers](#markers)
 - - [Part 2](#part-2)
+- - - [Extra translations and cleaning after doing the main mapping](extra-translations-and-cleaning-after-doing-the-main-mapping)
 - - - [Math](#math)
 - - [Beyond comparing](#english-to-french-mapper)
 
@@ -170,6 +172,43 @@ The English list should still include two extra rows indicating the French tags 
 
 Note that since the "no" shortform for number in English has no superscript, but n<sup>o</sup> in French does, the extra tag would result in the French content list being longer. As such, the tool replaces n<sup>o</sup> in French with a placeholder, "n_cap_sup_o_placeholder", for content alignment; this string is then converted back to n<sup>o</sup> in part 2.
 
+#### Different positioning of text around tags
+
+Sometimes, the tags may be the same in both documents, but the text is positioned around them differently so that one document has extra text.
+
+For example, the English document may have the following html:
+
+&lt;p>&lt;em>xyz (1)&lt;/em>&lt;/p>
+
+So it would produce the list
+- xyz (1)
+
+And the French document may have the following html:
+
+&lt;p>&lt;em>xyz&lt;/em> (1)&lt;/p>
+
+So it would produce the list
+- xyz
+- (1)
+
+In the case where the English content list has extra rows from differently positioned text, you can just add blank rows to the French content list until they align, as you would for extra English content from extra tags.
+
+In the above example, it is instead the French document that has extra content rows from differently positioned text. For this case, I have included placeholder tags to put into the English content rows, to be used in the same way as you would for extra French content from extra tags, indicating that the corresponding French content should be swapped around adjacent tags:
+- &lt;!r or &lt;!r1 indicates that the French content should be moved one tag later; this is what should be used in the above example.
+- &lt;!r2 indicates that the French content should be moved two consecutive tags later.
+- &lt;!r3 indicates that the French content should be moved three consecutive tags later.
+- &lt;!l or &lt;!l1 indicates that the French content should be moved one tag earlier.
+- &lt;!l2 indicates that the French content should be moved two consecutive tags earlier.
+- &lt;!l3 indicates that the French content should be moved three consecutive tags earlier.
+
+For the sake of simplicity, I have only implemented moving up to three consecutive tags away rather than a solution that allows any number of consecutive tags, since this is a relatively rare case to begin with.
+
+So for the above example, the English list should be changed to
+- xyz (1)
+- &lt;!r
+
+indicating that "xyz (1)" in the English content aligns with "xyz" in the French content, and "(1)" in the French content should be pushed back to one tag after "xyz", in this case to behind the "&lt;/em>".
+
 #### Scanning for differences
 
 In general, the English and French documents should have roughly similar contents in terms of length and location, so visually scanning through for jarring differences between the two content lists may be much faster than comparing line by line.
@@ -246,9 +285,24 @@ To prevent false positives, some of these rules require the content being search
 
 [English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-french-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
-After this, English links to the OSFI website and English WET footnotes are converted into French. All apostrophes ' are replaced with ’.
+### Extra translations and cleaning after doing the main mapping
+
+English links to the OSFI website and English WET footnotes are converted into French. All apostrophes ' are replaced with ’.
 
 French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
+
+If the option to fix spacing around punctuation is selected, the following punctuation issues are searched for and fixed:
+- ". ."
+- " ."
+- ".."
+- ", ,"
+- " ,"
+- ",,"
+- "; ;"
+- " ;"
+- ";;"
+- "::"
+- ": :"
 
 ### Math
 

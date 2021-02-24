@@ -1,0 +1,4 @@
+start1 placeholder1
+{BOLD-OPEN}def
+{BOLD-CLOSE} x
+end1 placeholder1
