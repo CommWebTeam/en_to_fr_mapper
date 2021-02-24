@@ -12,11 +12,11 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - [Aligning values](#english-to-french-mapper)
 - - - - [Extra English tags](#extra-tag-in-the-english-document)
 - - - - [Extra French tags](#extra-tag-in-the-french-document)
-- - - - [Extra French tags](#extra-tag-in-the-french-document)
+- - - - [Different positioning of text around tags](#different-positioning-of-text-around-tags)
 - - - - [Scanning for differences](#scanning-for-differences)
 - - - - [Markers](#markers)
 - - [Part 2](#part-2)
-- - - [Extra translations and cleaning after doing the main mapping](extra-translations-and-cleaning-after-doing-the-main-mapping)
+- - - [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
 - - - [Math](#math)
 - - [Beyond comparing](#english-to-french-mapper)
 
@@ -201,7 +201,7 @@ In the above example, it is instead the French document that has extra content r
 - &lt;!l2 indicates that the French content should be moved two consecutive tags earlier.
 - &lt;!l3 indicates that the French content should be moved three consecutive tags earlier.
 
-For the sake of simplicity, I have only implemented moving up to three consecutive tags away rather than a solution that allows any number of consecutive tags, since this is a relatively rare case to begin with.
+For the sake of simplicity, I have only implemented moving up to three consecutive tags away (rather than a solution that allows any number of consecutive tags), since this is a relatively rare case to begin with.
 
 So for the above example, the English list should be changed to
 - xyz (1)
