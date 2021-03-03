@@ -1,5 +1,6 @@
 does not match
 full match   
+regex[](-^)\characters
 append oti
 <oti
 </oti
