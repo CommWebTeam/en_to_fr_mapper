@@ -1,4 +1,43 @@
-start1 placeholder1
-{BOLD-OPEN}def
-{BOLD-CLOSE} x
+does1 not1 match1
+full1 match1
+append1
+oti1
+close oti1
+close otb2
+append2
+otb2
+append3
+cite3
+fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE==
+partial1 match1
+part$ial2 match2
+partial3 match$3
+33
+1
+55
+
+list1 numbering1
+3.4 list2 numbering2
+list3 numbering3
+list4 numbering4 
+list5 numbering5
+-2 not6 list6 numbering6
+extra1 spacing1
+less1 spacing1
+alphanumeric1
+alphanumeric2
+alphanumeric3
+other paragraph
+def
+x
+def
+x
+def
+x
+def
+x
+def
+x
+def
+x
 end1 placeholder1

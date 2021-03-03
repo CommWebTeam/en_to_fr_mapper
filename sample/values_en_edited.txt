@@ -1,4 +1,42 @@
-start placeholder
+does not match
+full match   
+append oti
+<oti
+</oti
+</otb
+append otb
+<otb>
+append cite
+<cite test="x"
+a{BOLD-OPEN}b{BOLD-CLOSE}c{ITALICS-OPEN}==FOOTNOTE-HERE==d{ITALICS-CLOSE}e==FOOTNOTE-HERE==
+partial match
+partial match
+partial match
+3
+-3
+5
+   empty value
+(1) list numbering a
+2.3.4 list numbering b
+22312.32323.431211.IVIVIVVV list numbering c
+IV.3 list numbering d
+1-1 list numbering e
+-1 not list numbering
+extra   spacing
+less spacing
+alphanumeric!,
+-alphanumeric
+$alpha$numeric
+test paragraph 12345
+<!l1
+abc x
+<!l2
+abc x
 <!l3
-{BOLD-OPEN}abc x
-end placeholder
+abc x
+<!r1
+abc x
+<!r2
+abc x
+<!r3
+abc x

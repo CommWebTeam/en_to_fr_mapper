@@ -300,7 +300,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		// only assume it's a list value if there are letters
 		if (/[a-zA-Z]/g.test(curr_content) && (curr_content.length >= min_cont_len)) {
 			// check for match after each list numbering formatting is removed
-			let content_no_list = curr_content.replace(/^(\\\([0-9IiVv]*\\\) *)*/g, "").replace(/^([0-9IiVv]*\\\.[0-9IiVv]* *)*/g, "").replace(/^([0-9IiVv]*-[0-9IiVv]* *)/g, "");
+			let content_no_list = curr_content.replace(/^(\\\([0-9IiVv]*\\\) *)*/g, "").replace(/^([0-9IiVv]+\\\.)[0-9IiVv\\\.]* */g, "").replace(/^([0-9IiVv]+-[0-9IiVv]+ *)/g, "");
 			let list_match = new RegExp("((^|>) *)(\\(*[0-9IiVv]*[\\.\\)-][0-9IiVv]* *)*" + content_no_list + "( *($|<))", "gi");
 			content_ind = regex_ind(struct_lines_placeholder, list_match);
 			// if match is found, change structure value and set struct counter
