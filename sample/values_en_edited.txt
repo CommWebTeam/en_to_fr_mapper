@@ -18,7 +18,7 @@ partial match
    empty value
 (1) list numbering a
 2.3.4 list numbering b
-22312.32323.431211.IVIVIVVV list numbering c
+22312.32323.431211..IVIVIVVV list numbering c
 IV.3 list numbering d
 1-1 list numbering e
 -1 not list numbering
