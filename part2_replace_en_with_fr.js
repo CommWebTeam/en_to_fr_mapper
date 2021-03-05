@@ -2,7 +2,7 @@ const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
-const br_placeholder = "BRNEWLINEPLACEHOLDER"
+const br_placeholder = "<BRNEWLINEPLACEHOLDER"
 
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
 const italic_open_marker_part2 = "{ITALICS-OPEN}"
@@ -335,7 +335,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		disregard spacing and br
 		============================
 		*/
-		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *(" + br_placeholder + ")* *") + "( *($|<))", "gi");
+		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *(?:" + br_placeholder + ")* *") + "( *($|<))", "gi");
 		if (curr_content.length >= min_cont_len) {
 			// check for match after spacing is disregarded
 			content_ind = regex_ind(struct_lines_placeholder, space_match);
