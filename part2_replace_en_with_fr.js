@@ -2,6 +2,7 @@ const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
+const br_placeholder = "BRNEWLINEPLACEHOLDER"
 
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
 const italic_open_marker_part2 = "{ITALICS-OPEN}"
@@ -162,13 +163,16 @@ function compare_content_len(a, b) {
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
-	console.log("Unmatched lines (first 100):");
+	console.log("Positions of nmatched lines (first 100):");
 	/*
 	============================
-	format structure and deal with math
+	format structure and clean up math
 	============================
 	*/
+	// get rid of special characters
 	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
+	// replace br with placeholders
+	cleaned_structure = cleaned_structure.replaceAll(/([\s]|\n)*<br[\/]*>([\s]|\n)*/g, br_placeholder);
 	// remove empty math equations
 	const empty_math = "<math></math>";
 	let no_empty_math_structure = cleaned_structure.replaceAll(empty_math, "");
@@ -188,7 +192,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	no_math_structure = no_math_structure.replaceAll("</math>", math_close_placeholder);
 	/*
 	============================
-	create multiple structures to keep track of cleaned french
+	split cleaned structure into lines and create multiple copies to keep track of cleaned french and handle math
 	============================
 	*/
 	// one to return
@@ -269,6 +273,10 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		equiv_fr_content = equiv_fr_content.replaceAll(/\b([0-9]+)e\b/g, "$1<sup>e</sup>");
 		/*
 		============================
+		Map english to french:
+		============================
+
+		============================
 		full values
 		============================
 		*/
@@ -324,10 +332,10 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		/*
 		============================
-		disregard spacing
+		disregard spacing and br
 		============================
 		*/
-		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *") + "( *($|<))", "gi");
+		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *(" + br_placeholder + ")* *") + "( *($|<))", "gi");
 		if (curr_content.length >= min_cont_len) {
 			// check for match after spacing is disregarded
 			content_ind = regex_ind(struct_lines_placeholder, space_match);
@@ -491,6 +499,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			struct_str = struct_str.replace(empty_math, math_contents[i]);
 		}	
 	}
-	// fix french apostrophes and remove placeholders
+	// add br back in
+	struct_str = struct_str.replaceAll(br_placeholder, " <br/>\n");
+	// fix french apostrophes and remove empty line placeholders
 	return struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
 }

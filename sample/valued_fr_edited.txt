@@ -9,7 +9,7 @@ append2
 otb2
 append3
 cite3
-fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE==
+fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE== n_sup_o_placeholder n_cap_sup_o_placeholder
 partial1 match1
 part$ial2 match2
 partial3 match$3
@@ -28,6 +28,8 @@ less1 spacing1
 alphanumeric1
 alphanumeric2
 alphanumeric3
+break1 point1 a1
+break2 point2 b2
 other paragraph
 def
 x

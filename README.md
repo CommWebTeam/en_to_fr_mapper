@@ -264,8 +264,8 @@ The tool sorts the english content list into tiers by string length of the conte
 - for example, "bar" will match to "&lt;p>foo bar&lt;/p>"
 3. Full tag/line match once substrings common to list numberings are removed, including "1.", "(1)", and "1-". Currently checks for numeric and roman list numberings; alphabetical list numberings are optional, since false positives are more likely.
 - for example, "1. foo bar" will match to "&lt;p>foo bar&lt;/p>".
-4. Spacing differences ignored.
-- for example, "foo bar" will match to "&lt;p>foo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar&lt;/p>".
+4. Spacing differences ignored, including &lt;br> and &lt;br/> breaking up content.
+- for example, "foo bar bar" will match to "&lt;p>foo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bar &lt;br> bar&lt;/p>".
 5. Math tags ignored in the structure.
 - for example, "foo bar" will match to "&lt;p>foo &lt;math>&lt;mi>x&lt;/mi>&lt;/math> bar&lt;/p>".
 6. Math tags reduced to their mi, mo, and mn characters in the structure.
