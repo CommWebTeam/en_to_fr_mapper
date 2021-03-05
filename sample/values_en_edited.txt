@@ -4,11 +4,12 @@ regex[](-^)\characters
 append oti
 <oti
 </oti
-</otb
 append otb
 <otb>
 append cite
 <cite test="x"
+</cite>
+</otb
 a{BOLD-OPEN}b{BOLD-CLOSE}c{ITALICS-OPEN}==FOOTNOTE-HERE==d{ITALICS-CLOSE}e==FOOTNOTE-HERE==
 partial match
 partial match

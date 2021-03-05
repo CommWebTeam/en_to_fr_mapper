@@ -4,11 +4,12 @@ regex1 characters1
 append1
 oti1
 close oti1
-close otb2
 append2
 otb2
 append3
 cite3
+close cite3
+close otb2
 fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE== n_sup_o_placeholder n_cap_sup_o_placeholder
 partial1 match1
 part$ial2 match2

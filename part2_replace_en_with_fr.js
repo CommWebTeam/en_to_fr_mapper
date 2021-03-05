@@ -2,7 +2,7 @@ const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
-const br_placeholder = "<BRNEWLINEPLACEHOLDER"
+const br_placeholder = "<BRNEWLINEPLACEHOLDER>"
 
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
 const italic_open_marker_part2 = "{ITALICS-OPEN}"
