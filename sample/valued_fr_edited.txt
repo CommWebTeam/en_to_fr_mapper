@@ -10,7 +10,7 @@ append3
 cite3
 close cite3
 close otb2
-fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE== n_sup_o_placeholder n_cap_sup_o_placeholder
+fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE== n_sup_o_placeholder n_cap_sup_o_placeholder 1er 35e  /Eng/ /eng/ Return to footnote Footnotes Footnote
 partial1 match1
 part$ial2 match2
 partial3 match$3

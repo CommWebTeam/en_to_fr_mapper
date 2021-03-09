@@ -268,9 +268,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		// escape $ from french content
 		equiv_fr_content = equiv_fr_content.replaceAll("$", "$$$");
-		// add superscripts for lists
-		equiv_fr_content = equiv_fr_content.replaceAll(/\b1er\b/g, "1<sup>er</sup>");
-		equiv_fr_content = equiv_fr_content.replaceAll(/\b([0-9]+)e\b/g, "$1<sup>e</sup>");
 		/*
 		============================
 		Map english to french:
@@ -469,8 +466,9 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l1>/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?>)([^<]*?)<!l2>/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?> *<[^<]*?>)([^<]*?)<!l3>/g, "$2$1");
-	// translate english link formattings and footnotes using basic_format function
+	// translate english link formattings and footnotes using basic_format functions
 	struct_lines = struct_lines.map(translate_to_fr);
+	struct_lines = struct_lines.map(add_fr_num_superscript);
 	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
 	// fix multispace if selected
 	if (fix_multispace) {
