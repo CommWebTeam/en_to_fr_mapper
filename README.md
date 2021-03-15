@@ -1,7 +1,7 @@
 # English to French mapper
 A string mapper that restructures a french html document based on its english counterpart.
 
-[HTML document here.](entofr.html)
+[HTML page of tool here.](entofr.html)
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
