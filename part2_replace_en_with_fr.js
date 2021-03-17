@@ -267,7 +267,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			continue;
 		}
 		// escape $ from french content
-		equiv_fr_content = equiv_fr_content.replaceAll("$", "$$$");
+		equiv_fr_content = equiv_fr_content.replaceAll("$", "$$");
 		/*
 		============================
 		Map english to french:
@@ -476,17 +476,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	}
 	// fix punctuation if selected
 	if (fix_punct) {
-		struct_lines = replace_arr(struct_lines, ". .", ".");
-		struct_lines = replace_arr(struct_lines, " .", ".");
-		struct_lines = replace_arr(struct_lines, "..", ".");
-		struct_lines = replace_arr(struct_lines, ", ,", ",");
-		struct_lines = replace_arr(struct_lines, " ,", ",");
-		struct_lines = replace_arr(struct_lines, ",,", ",");
-		struct_lines = replace_arr(struct_lines, "; ;", ";");
-		struct_lines = replace_arr(struct_lines, " ;", ";");
-		struct_lines = replace_arr(struct_lines, ";;", ";");
-		struct_lines = replace_arr(struct_lines, ": :", ":");
-		struct_lines = replace_arr(struct_lines, "::", ":");
+		struct_lines = struct_lines.map(fix_punctuation);
 	}
 	// add math tags back in
 	let struct_str = struct_lines.join('\n');

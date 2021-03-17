@@ -39,7 +39,7 @@ Using this tool is broken into two parts. In short:
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
 ## Part 1:
-Extract lists of the english and french contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting).
+Extract lists of the english and french contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting using some functions from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/)).
 
 This is done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&lt;/b>z&lt;/p>" creates a list with the following rows:
 - x
@@ -255,7 +255,9 @@ I have included an option that, if selected, adds markers to aid in scanning for
 These markers are automatically removed in part 2.
 
 ## Part 2:
-Using the manually realigned outputs from part 1 as inputs, map french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
+Using the manually realigned outputs from part 1 as inputs, the tool maps french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
+
+This part is where the tool attempts to automate the process of translation. The implementation details are as follows:
 
 The tool sorts the english content list into tiers by string length of the content (the highest tier of content, i.e. the longest pieces, appear first on the ordered content list), with content within tiers being sorted by original order. For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
 1. Full tag/line: the content should consist of either an entire line in the new english structure, or the entire content for a tag.
@@ -291,18 +293,7 @@ English links to the OSFI website and English WET footnotes are converted into F
 
 French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
 
-If the option to fix spacing around punctuation is selected, the following punctuation issues are searched for and fixed:
-- ". ."
-- " ."
-- ".."
-- ", ,"
-- " ,"
-- ",,"
-- "; ;"
-- " ;"
-- ";;"
-- "::"
-- ": :"
+If the option to fix spacing around punctuation is selected, then the fix_punctuation function from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/) is called.
 
 ### Math
 
