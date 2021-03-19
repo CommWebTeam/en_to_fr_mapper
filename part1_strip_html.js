@@ -48,7 +48,8 @@ function strip_html(html_str, insert_markers, remove_br) {
 	============================
 	*/
 	// make spacings consistent
-	clean_html_str = format_spacing(html_str);
+	let clean_html_str = replace_invisible_nbsp(html_str);
+	clean_html_str = remove_multispace(clean_html_str);
 	// remove br from tables if option is selected
 	if (remove_br) {
 		// remove empty tables
@@ -69,6 +70,7 @@ function strip_html(html_str, insert_markers, remove_br) {
 	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
 	clean_html_str = remove_ref_links(clean_html_str);
 	clean_html_str = remove_toc_links(clean_html_str);
+	clean_html_str = remove_bookmark_links(clean_html_str);
 	clean_html_str = remove_logiterms(clean_html_str);
 	clean_html_str = join_em_strong(clean_html_str);
 	clean_html_str = fix_fake_scripts(clean_html_str);
@@ -76,8 +78,6 @@ function strip_html(html_str, insert_markers, remove_br) {
 	// remove first few lines of html file
 	let html_arr = clean_html_str.split('\n');
 	html_arr = html_arr.slice(6, html_arr.length);
-	// check spacing consistency again
-	html_arr = html_arr.map(format_spacing);
 	// add placeholders for footnotes, italics, and bold if option is selected
 	if (insert_markers) {
 		html_arr = html_arr.map(x => x.replaceAll(/<a href="#_ftn[0-9]+" name="_ftnref[0-9]+" title="">(.*?)<\/a>/g, "\n" + footnote_marker));
@@ -88,6 +88,8 @@ function strip_html(html_str, insert_markers, remove_br) {
 	}
 	// replace special characters
 	html_arr = html_arr.map(replace_special_chars);
+	// check spacing consistency again
+	html_arr = html_arr.map(format_spacing);
 	/*
 	============================
 	create content list

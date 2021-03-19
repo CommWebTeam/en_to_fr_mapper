@@ -163,7 +163,7 @@ function compare_content_len(a, b) {
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
-	console.log("Positions of nmatched lines (first 100):");
+	console.log("Positions of unmatched lines (first 100):");
 	/*
 	============================
 	format structure and clean up math
@@ -229,9 +229,11 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	content_len.sort(compare_content_len);
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
+		console.log(i)
 		let posn = content_len[i].position;
 		let curr_content = content_len[i].value;
 		let curr_content_orig = en_contents_orig[posn].trim();
+		console.log(curr_content)
 		/*
 		============================
 		get equivalent french content
