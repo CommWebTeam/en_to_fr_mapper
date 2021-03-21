@@ -38,9 +38,9 @@ abc x
 abc x
 <!l3
 abc x
-<!r1
-abc x
+def y
 <!r2
-abc x
+def y
 <!r3
-abc x
+def y
+<!r1

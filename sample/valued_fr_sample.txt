@@ -32,16 +32,16 @@ alphanumeric3
 break1 point1 a1
 break2 point2 b2
 other paragraph
-def
+abc1
 x
-def
+abc1
 x
-def
+abc1
 x
-def
-x
-def
-x
-def
-x
+def1
+y
+def1
+y
+def1
+y
 end1 placeholder1

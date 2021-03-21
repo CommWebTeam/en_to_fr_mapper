@@ -2,6 +2,7 @@ const empty_line_placeholder = "EMPTYLINE123456789PLACEHOLDER"
 const unmatchable_string_placeholder = "FILLER123456789PLACEHOLDER";
 const math_open_placeholder = "MATHOPENPLACEHOLDER";
 const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
+const math_placeholder_regex = new RegExp(math_open_placeholder + "(.*?)" + math_close_placeholder, "g");
 const br_placeholder = "<BRNEWLINEPLACEHOLDER>"
 
 const footnote_marker_part2 = "==FOOTNOTE-HERE=="
@@ -159,6 +160,32 @@ function compare_content_len(a, b) {
 	return b_len - a_len;
 }
 
+// helper functions to temporarily edit placeholder struct for clean content:
+// get rid of br placeholder and make spacing consistent
+function placeholder_space(x) {
+	return x.replaceAll(br_placeholder, " ").replaceAll(" *", " ").replaceAll(/ +/g, " ");
+}
+// get rid of math placeholder
+function placeholder_no_math(x) {
+	return x.replaceAll(math_placeholder_regex, "");
+}
+// reduce math placeholder
+function placeholder_reduced_math(x) {
+	return x.replaceAll(math_placeholder_regex, function(match, capture) {
+		return extract_mi_str(capture);
+	});
+}
+// replace alphanumeric characters
+function placeholder_non_alphanumeric(x) {
+	// check for alphanumeric matches: leading/trailing non-alphanumeric characters are removed
+	let special_match_str = x.replace(/^[^0-9a-zA-Z]*(.*)/g, "$1").replace(/(.*?)[^0-9a-zA-Z]*$/g, "$1");
+	// internal special characters are replaced with spaces
+	special_match_str = special_match_str.replaceAll(/&[a-zA-Z0-9]+;/g, " ");
+	// internal non-alphanumeric characters are replaced with spaces
+	special_match_str = special_match_str.replaceAll(/[^a-zA-Z0-9]/g, " ");
+	return special_match_str;
+}
+
 // Replace English substrings with French substrings
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
@@ -199,13 +226,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	let struct_lines = no_math_structure.split("\n");
 	// one to keep track of which lines have been edited
 	let struct_lines_placeholder = no_math_structure.split("\n");
-	// one with math removed
-	let math_placeholder_regex = new RegExp(math_open_placeholder + "(.*?)" + math_close_placeholder, "g");
-	let struct_lines_no_math = no_math_structure.replaceAll(math_placeholder_regex, "").split("\n");
-	// one with math reduced to its values
-	let struct_lines_reduced_math = no_math_structure.replaceAll(math_placeholder_regex, function(match, capture) {
-		return extract_mi_str(capture);
-	}).split("\n");
 	// Note that the two math-related structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic since we don't keep track of when they're edited, but ideally they're rare enough edge cases that it shouldn't be a big deal
 	/*
 	============================
@@ -229,11 +249,9 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	content_len.sort(compare_content_len);
 	// loop through english content and get its index in remaining structure
 	for (i = 0; i < ncontents; i++) {
-		console.log(i)
 		let posn = content_len[i].position;
 		let curr_content = content_len[i].value;
 		let curr_content_orig = en_contents_orig[posn].trim();
-		console.log(curr_content)
 		/*
 		============================
 		get equivalent french content
@@ -334,14 +352,17 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		disregard spacing and br
 		============================
 		*/
-		let space_match = new RegExp("((^|>) *)" + curr_content.replaceAll(" *", " ").replaceAll(" ", " *(?:" + br_placeholder + ")* *") + "( *($|<))", "gi");
+		let space_match_str = placeholder_space(curr_content);
+		let space_match_regex = new RegExp(space_match_str.replaceAll(" ", "( |" + br_placeholder + ")*"));
+		let space_match = new RegExp("((^|>) *)" + space_match_str + "( *($|<))", "gi");
 		if (curr_content.length >= min_cont_len) {
+			let spacing_struct = struct_lines_placeholder.map(placeholder_space);
 			// check for match after spacing is disregarded
-			content_ind = regex_ind(struct_lines_placeholder, space_match);
+			content_ind = regex_ind(spacing_struct, space_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
-				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match, "$1" + equiv_fr_content + "$3");
-				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(space_match, unmatchable_string_placeholder);
+				struct_lines[content_ind] = struct_lines[content_ind].replace(space_match_regex, "$1" + equiv_fr_content + "$3");
+				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(space_match_regex, unmatchable_string_placeholder);
 				continue;
 			}
 		}
@@ -352,7 +373,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		// if option is selected, check for match after math is removed
 		if (math_check) {
-			content_ind = regex_ind(struct_lines_no_math, newline_match);
+			let no_math_struct = struct_lines_placeholder.map(placeholder_no_math);
+			content_ind = regex_ind(no_math_struct, newline_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				let curr_line_no_math = struct_lines[content_ind].replaceAll(math_placeholder_regex, "");
@@ -373,7 +395,8 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		// if option is selected, check for match after math is reduced to its values
 		if (math_check) {
-			content_ind = regex_ind(struct_lines_reduced_math, space_match);
+			let reduced_math_struct = struct_lines_placeholder.map(placeholder_reduced_math);
+			content_ind = regex_ind(reduced_math_struct, space_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
 				let curr_line_reduced_math = struct_lines[content_ind].replaceAll(math_placeholder_regex, function(match, capture) {
@@ -395,28 +418,24 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		============================
 		*/
 		if (curr_content.length >= min_cont_len) {
-			// check for alphanumeric matches: leading/trailing non-alphanumeric characters are removed
-			let special_match_str = curr_content_orig.replace(/^[^0-9a-zA-Z]*(.*)/g, "$1").replace(/(.*?)[^0-9a-zA-Z]*$/g, "$1");
-			// internal special characters are replaced with placeholders
-			special_match_str = special_match_str.replaceAll(/&[a-zA-Z0-9]+;/g, " ");
-			// internal non-alphanumeric characters are replaced with placeholders
-			special_match_str = special_match_str.replaceAll(/[^a-zA-Z0-9]/g, " *[^a-zA-Z0-9] *");
-			let special_match_str_regex = new RegExp(special_match_str);
+			let special_match_str = placeholder_non_alphanumeric(curr_content_orig);
+			let special_match_str_regex = new RegExp(special_match_str.replaceAll(" ", "((&[a-zA-Z0-9]+;)|([^0-9a-zA-Z]*))"));
 			// check this for fully matching tag/newline first
 			let newline_special_match = new RegExp("((^|>) *)" + special_match_str + "( *($|<))", "gi");
-			content_ind = regex_ind(struct_lines_placeholder, newline_special_match);
+			let alphanumeric_struct = struct_lines_placeholder.map(placeholder_non_alphanumeric);
+			content_ind = regex_ind(alphanumeric_struct, newline_special_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
-				struct_lines[content_ind] = struct_lines[content_ind].replace(newline_special_match, "$1" + equiv_fr_content + "$3");
+				struct_lines[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, "$1" + equiv_fr_content + "$3");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
 				continue;
 			}
 			// check for partial match
 			let word_special_match = new RegExp("(^|[^a-zA-Z0-9])" + special_match_str + "($|[^a-zA-Z0-9])", "gi");
-			content_ind = regex_ind(struct_lines_placeholder, word_special_match);
+			content_ind = regex_ind(alphanumeric_struct, word_special_match);
 			// if match is found, change structure value and set struct counter
 			if (content_ind > -1) {
-				struct_lines[content_ind] = struct_lines[content_ind].replace(word_special_match, "$1" + equiv_fr_content + "$2");
+				struct_lines[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, "$1" + equiv_fr_content + "$2");
 				struct_lines_placeholder[content_ind] = struct_lines[content_ind].replace(special_match_str_regex, unmatchable_string_placeholder);
 				continue;
 			}
