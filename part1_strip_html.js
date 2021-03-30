@@ -49,7 +49,7 @@ function strip_html(html_str, insert_markers, remove_br) {
 	*/
 	// make spacings consistent
 	let clean_html_str = replace_invisible_nbsp(html_str);
-	clean_html_str = remove_multispace(clean_html_str);
+	clean_html_str = rm_multispace(clean_html_str);
 	// remove br from tables if option is selected
 	if (remove_br) {
 		// remove empty tables
