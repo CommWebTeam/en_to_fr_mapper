@@ -68,10 +68,10 @@ function strip_html(html_str, insert_markers, remove_br) {
 	clean_html_str = clean_html_str.replaceAll("n&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no);
 	clean_html_str = clean_html_str.replaceAll("N&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no_cap);
 	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
-	clean_html_str = remove_ref_links(clean_html_str);
-	clean_html_str = remove_toc_links(clean_html_str);
-	clean_html_str = remove_bookmark_links(clean_html_str);
-	clean_html_str = remove_logiterms(clean_html_str);
+	clean_html_str = rm_ref_links(clean_html_str);
+	clean_html_str = rm_toc_links(clean_html_str);
+	clean_html_str = rm_bookmark_links(clean_html_str);
+	clean_html_str = rm_logiterms(clean_html_str);
 	clean_html_str = join_em_strong(clean_html_str);
 	clean_html_str = fix_fake_scripts(clean_html_str);
 	clean_html_str = fix_fake_math(clean_html_str);
