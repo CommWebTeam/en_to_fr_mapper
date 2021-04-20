@@ -100,15 +100,15 @@ function strip_html(html_str, insert_markers, remove_br) {
 	// get rid of tags
 	content_arr = html_arr.map(x => x.replaceAll(/<.*?>/g, "\n"));
 	// remove indents, list numberings, and empty lines
-	content_arr = content_arr.trim();
+	content_arr = content_arr.map(x => x.trim());
 	content_arr = content_arr.map(rm_list);
 	content_arr = rm_empty_lines(content_arr);
-	content_arr = content_arr.trim();
+	content_arr = content_arr.map(x => x.trim());
 	// join array back into string and split it again to get actual list
 	content_arr_str = content_arr.join('\n');
 	content_arr = content_arr_str.split('\n');
 	// remove empty lines
-	content_arr = content_arr.trim();
+	content_arr = content_arr.map(x => x.trim());
 	content_arr = rm_empty_lines(content_arr);
 	// get rid of contents that only consist of placeholders
 	if (insert_markers) {

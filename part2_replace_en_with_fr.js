@@ -66,11 +66,16 @@ function get_content_array(html_str) {
 	html_str_no_markers = html_str_no_markers.replaceAll(fr_placeholder_sup_no, "n<sup>o</sup>").replaceAll(fr_placeholder_sup_no_cap, "N<sup>o</sup>");
 	// split into array
 	let html_arr = html_str_no_markers.split("\n");
-	// remove extra characters
-	html_arr = html_arr.trim();
+	// remove extra spacing
+	html_arr = html_arr.map(x => x.trim());
 	html_arr = html_arr.map(format_spacing);
-	// replace empty array elements
-	return html_arr.replaceAll("", empty_line_placeholder);
+	// replace empty array elements with placeholders
+	for (let i = 0; i < html_arr.length; i++) {
+		if (html_arr[i].trim() === "") {
+			html_arr[i] = empty_line_placeholder;
+		}
+	}
+	return html_arr;
 }
 
 /*
