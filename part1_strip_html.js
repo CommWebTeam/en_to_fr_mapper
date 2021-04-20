@@ -1,11 +1,3 @@
-const footnote_marker = "==FOOTNOTE-HERE=="
-const italic_open_marker = "{ITALICS-OPEN}"
-const italic_close_marker = "{ITALICS-CLOSE}"
-const bold_open_marker = "{BOLD-OPEN}"
-const bold_close_marker = "{BOLD-CLOSE}"
-const fr_placeholder_sup_no = "n_sup_o_placeholder"
-const fr_placeholder_sup_no_cap = "n_cap_sup_o_placeholder"
-
 /*
 =================================
 Part 1 - get content
@@ -39,6 +31,16 @@ function create_content_lists() {
 }
 
 /* Helper functions */
+
+// remove numberings for lists
+function rm_list(html_line) {
+	// only assume it's a list value if there are letters
+	if (/[a-zA-Z]/g.test(html_line)) {
+		let cleaned = html_line.replaceAll(/((^|>) *)([0-9IiVv]*[\.-][0-9IiVv]* *)*/g, "$2");
+		return cleaned;
+	}
+	return html_line;
+}
 
 // formats html file and strips all of its tags to create a list of content values
 function strip_html(html_str, insert_markers, remove_br) {
@@ -98,15 +100,15 @@ function strip_html(html_str, insert_markers, remove_br) {
 	// get rid of tags
 	content_arr = html_arr.map(x => x.replaceAll(/<.*?>/g, "\n"));
 	// remove indents, list numberings, and empty lines
-	content_arr = trim_arr(content_arr);
+	content_arr = content_arr.trim();
 	content_arr = content_arr.map(rm_list);
 	content_arr = rm_empty_lines(content_arr);
-	content_arr = trim_arr(content_arr);
+	content_arr = content_arr.trim();
 	// join array back into string and split it again to get actual list
 	content_arr_str = content_arr.join('\n');
 	content_arr = content_arr_str.split('\n');
 	// remove empty lines
-	content_arr = trim_arr(content_arr);
+	content_arr = content_arr.trim();
 	content_arr = rm_empty_lines(content_arr);
 	// get rid of contents that only consist of placeholders
 	if (insert_markers) {

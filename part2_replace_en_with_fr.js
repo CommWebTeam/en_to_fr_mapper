@@ -5,14 +5,6 @@ const math_close_placeholder = "MATHCLOSEPLACEHOLDER";
 const math_placeholder_regex = new RegExp(math_open_placeholder + "(.*?)" + math_close_placeholder, "g");
 const br_placeholder = "<BRNEWLINEPLACEHOLDER>"
 
-const footnote_marker_part2 = "==FOOTNOTE-HERE=="
-const italic_open_marker_part2 = "{ITALICS-OPEN}"
-const italic_close_marker_part2 = "{ITALICS-CLOSE}"
-const bold_open_marker_part2 = "{BOLD-OPEN}"
-const bold_close_marker_part2 = "{BOLD-CLOSE}"
-const fr_placeholder_sup_no_part2 = "n_sup_o_placeholder"
-const fr_placeholder_sup_no_cap_part2 = "n_cap_sup_o_placeholder"
-
 /*
 =================================
 Part 2 - create french structure
@@ -60,20 +52,32 @@ function create_fr_html() {
 
 /* Helper functions */
 
+/*
+============================
+Helper function to clean string of content from part 1 into a content array
+============================
+*/
+
 // convert string of contents into an array, removing markers/empty lines
 function get_content_array(html_str) {
 	// remove markers
-	let html_str_no_markers = html_str.replaceAll(footnote_marker_part2, "").replaceAll(italic_open_marker_part2, "").replaceAll(italic_close_marker_part2, "").replaceAll(bold_open_marker_part2, "").replaceAll(bold_close_marker_part2, "");
+	let html_str_no_markers = html_str.replaceAll(footnote_marker, "").replaceAll(italic_open_marker, "").replaceAll(italic_close_marker, "").replaceAll(bold_open_marker, "").replaceAll(bold_close_marker, "");
 	// add n<sup>o</sup> back in
-	html_str_no_markers = html_str_no_markers.replaceAll(fr_placeholder_sup_no_part2, "n<sup>o</sup>").replaceAll(fr_placeholder_sup_no_cap_part2, "N<sup>o</sup>");
+	html_str_no_markers = html_str_no_markers.replaceAll(fr_placeholder_sup_no, "n<sup>o</sup>").replaceAll(fr_placeholder_sup_no_cap, "N<sup>o</sup>");
 	// split into array
 	let html_arr = html_str_no_markers.split("\n");
 	// remove extra characters
-	html_arr = trim_arr(html_arr);
+	html_arr = html_arr.trim();
 	html_arr = html_arr.map(format_spacing);
 	// replace empty array elements
-	return replace_empty_lines(html_arr, empty_line_placeholder);
+	return html_arr.replaceAll("", empty_line_placeholder);
 }
+
+/*
+============================
+Helper functions to extract math tag values from a string
+============================
+*/
 
 // extract mi, mo, mn from math
 function extract_mi_str(math_html_str) {
@@ -95,6 +99,12 @@ function extract_math_tags(html_str) {
 	end_non_math =  new RegExp("^(.*" + math_close_placeholder + ").*$", "g");
 	return html_str.replaceAll(init_non_math, math_open_placeholder).replaceAll(middle_non_math, math_close_placeholder + math_open_placeholder).replaceAll(end_non_math, "$1");
 }
+
+/*
+============================
+Helper function to get length of content for sorting
+============================
+*/
 
 // Get (hard-coded) tier for content lengths
 function get_cont_len_tier(x) {
@@ -160,21 +170,29 @@ function compare_content_len(a, b) {
 	return b_len - a_len;
 }
 
-// helper functions to temporarily edit placeholder struct for clean content:
+/*
+============================
+Helper functions to temporarily edit placeholder struct to check if a match can be found in it
+============================
+*/
+
 // get rid of br placeholder and make spacing consistent
 function placeholder_space(x) {
 	return x.replaceAll(br_placeholder, " ").replaceAll(" *", " ").replaceAll(/ +/g, " ");
 }
+
 // get rid of math placeholder
 function placeholder_no_math(x) {
 	return x.replaceAll(math_placeholder_regex, "");
 }
+
 // reduce math placeholder
 function placeholder_reduced_math(x) {
 	return x.replaceAll(math_placeholder_regex, function(match, capture) {
 		return extract_mi_str(capture);
 	});
 }
+
 // replace alphanumeric characters
 function placeholder_non_alphanumeric(x) {
 	// check for alphanumeric matches: leading/trailing non-alphanumeric characters are removed
@@ -186,7 +204,28 @@ function placeholder_non_alphanumeric(x) {
 	return special_match_str;
 }
 
-// Replace English substrings with French substrings
+/*
+============================
+Helper functions to work with array of cleaned structure
+============================
+*/
+
+// replace values in string array
+function replace_arr(html_array, to_replace, replacement) {
+	return html_array.map(x => x.replaceAll(to_replace, replacement));
+}
+
+// find first string in array that contains matching regex
+function regex_ind(struct_arr, regex_str) {
+	return struct_arr.findIndex(x => regex_str.test(x));
+}
+
+/*
+============================
+Replace English substrings with French substrings
+============================
+*/
+
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	let unmatched_lines = 0;
@@ -219,14 +258,13 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	no_math_structure = no_math_structure.replaceAll("</math>", math_close_placeholder);
 	/*
 	============================
-	split cleaned structure into lines and create multiple copies to keep track of cleaned french and handle math
+	split cleaned structure into lines
 	============================
 	*/
-	// one to return
+	// one copy to return
 	let struct_lines = no_math_structure.split("\n");
-	// one to keep track of which lines have been edited
+	// one copy to keep track of which lines have been edited
 	let struct_lines_placeholder = no_math_structure.split("\n");
-	// Note that the two math-related structures are not edited alongside the placeholder structure for the sake of simplicity, which could be problematic since we don't keep track of when they're edited, but ideally they're rare enough edge cases that it shouldn't be a big deal
 	/*
 	============================
 	format en contents and convert to regex
@@ -487,7 +525,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l1>/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?>)([^<]*?)<!l2>/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?> *<[^<]*?>)([^<]*?)<!l3>/g, "$2$1");
-	// translate english link formattings and footnotes using basic_format functions
+	// translate english link formattings and footnotes using gen_dw_format functions
 	struct_lines = struct_lines.map(translate_to_fr);
 	struct_lines = struct_lines.map(add_fr_num_superscript);
 	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
