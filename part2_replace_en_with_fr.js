@@ -244,7 +244,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	// get rid of special characters
 	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
 	// replace br with placeholders
-	cleaned_structure = cleaned_structure.replaceAll(/([\s]|\n)*<br[\/]*>([\s]|\n)*/g, br_placeholder);
+	cleaned_structure = cleaned_structure.replaceAll(/([\s]|\n)*<br[ \/]*>([\s]|\n)*/g, br_placeholder);
 	// remove empty math equations
 	const empty_math = "<math></math>";
 	let no_empty_math_structure = cleaned_structure.replaceAll(empty_math, "");
@@ -567,7 +567,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}	
 	}
 	// add br back in
-	struct_str = struct_str.replaceAll(br_placeholder, " <br/>\n");
+	struct_str = struct_str.replaceAll(br_placeholder, " <br />\n");
 	// fix french apostrophes and remove empty line placeholders
 	return struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
 }
