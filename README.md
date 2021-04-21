@@ -1,36 +1,36 @@
 # English to French mapper
-A string mapper that restructures a french html document based on its english counterpart.
+A string mapper that restructures a French html document based on its English counterpart.
 
 [HTML page of tool here.](entofr.html)
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
 *Table of Contents*
-- [English to French mapper](#english-to-french-mapper)
-- - [Overview](#english-to-french-mapper)
+- [English to French mapper](#English-to-French-mapper)
+- - [Overview](#English-to-French-mapper)
 - - [Part 1](#part-1)
-- - - [Aligning values](#english-to-french-mapper)
-- - - - [Extra English tags](#extra-tag-in-the-english-document)
-- - - - [Extra French tags](#extra-tag-in-the-french-document)
+- - - [Aligning values](#English-to-French-mapper)
+- - - - [Extra English tags](#extra-tag-in-the-English-document)
+- - - - [Extra French tags](#extra-tag-in-the-French-document)
 - - - - [Different positioning of text around tags](#different-positioning-of-text-around-tags)
 - - - - [Scanning for differences](#scanning-for-differences)
 - - - - [Markers](#markers)
 - - [Part 2](#part-2)
 - - - [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
 - - - [Math](#math)
-- - [Beyond comparing](#english-to-french-mapper)
+- - [Beyond comparing](#English-to-French-mapper)
 
 ## Overview
 
-We usually work with both english and french translations of the same document, and ideally, the structures of their word documents should be the same. The intention of this tool is for the user to only have to manually clean the english translation of the document to standards; the tool can then do most of the work for creating a cleaned french translation of the document.
+We usually work with both English and French translations of the same document, and ideally, the structures of their word documents should be the same. The intention of this tool is for the user to only have to manually clean the English translation of the document to standards; the tool can then do most of the work for creating a cleaned French translation of the document.
 
 Input:
-- the french html document with the old structure (the word document pasted into Dreamweaver)
-- the equivalent english html document with the old structure
-- the same english html document with the new, manually cleaned structure
+- the French html document with the old structure (the word document pasted into Dreamweaver)
+- the equivalent English html document with the old structure
+- the same English html document with the new, manually cleaned structure
 
 Output:
-- the french html document with the new structure
+- the French html document with the new structure
 
 Using this tool is broken into two parts. In short:
 1. the first part creates two lists of contents from the old structure, one for the English contents and one for the French contents.
@@ -39,14 +39,14 @@ Using this tool is broken into two parts. In short:
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
 
 ## Part 1:
-Extract lists of the english and french contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting using some functions from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/)).
+Extract lists of the English and French contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting using some functions from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/)).
 
 This is done by replacing the html tags with newlines so that each content separated by tags is on its own line. All contents are trimmed of whitespace. For example, the string "&lt;p>x&lt;b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&lt;/b>z&lt;/p>" creates a list with the following rows:
 - x
 - y
 - z
 
-Part 2 uses the indices of these lists to map values. For example, the 3rd value of the english list will map to the 3rd value of the french list. If the old English document has the html
+Part 2 uses the indices of these lists to map values. For example, the 3rd value of the English list will map to the 3rd value of the French list. If the old English document has the html
 
 &lt;p>x&lt;b>y&lt;/b>z&lt;/p>
 
@@ -80,7 +80,7 @@ While there may be more elegant ways to map contents, I feel that this is a quic
 
 ### Aligning values
 
-Ideally, the old structure documents will have the exact same html structure in both languages. However, this isn't usually realistic, so I have split extracting the content from the rest of the tool's workflow. The user should download the english content list (by default en_values.txt) and french content list (by default fr_values.txt), both newline-delimited, and manually ensure their indices align correctly.
+Ideally, the old structure documents will have the exact same html structure in both languages. However, this isn't usually realistic, so I have split extracting the content from the rest of the tool's workflow. The user should download the English content list (by default en_values.txt) and French content list (by default fr_values.txt), both newline-delimited, and manually ensure their indices align correctly.
 
 I personally use Beyond Compare to align the values since it nicely lays out the two lists side-by-side. To make this easier, go to Session -> Session Settings -> Alignment and set the files to Unaligned. Make sure to save and reload after every edit you make to either of the files so that the rows of the two files continue to align (since each time you add a line to one of the files, they will dealign).
 
@@ -255,12 +255,14 @@ I have included an option that, if selected, adds markers to aid in scanning for
 These markers are automatically removed in part 2.
 
 ## Part 2:
-Using the manually realigned outputs from part 1 as inputs, the tool maps french contents from the old structure onto the new english structure. As described in [part 1](#part-1), this is done by finding each value in the list of english content in the new english structure, and replacing it with the same indexed value in the list of french content.
+Using the manually realigned outputs from part 1 as inputs, the tool maps French contents from the old structure onto the new English structure. As described in [part 1](#part-1), this is done by finding each value in the list of English content in the new English structure, and replacing it with the same indexed value in the list of French content.
+
+The output comes in two files. The first file contains the lines for the English content that failed to be mapped, meaning the content wasn't in the cleaned English structure. The second file contains the actual html document of the cleaned structure that now has its English contents replaced with French.
 
 This part is where the tool attempts to automate the process of translation. The implementation details are as follows:
 
-The tool sorts the english content list into tiers by string length of the content (the highest tier of content, i.e. the longest pieces, appear first on the ordered content list), with content within tiers being sorted by original order. For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
-1. Full tag/line: the content should consist of either an entire line in the new english structure, or the entire content for a tag.
+The tool sorts the English content list into tiers by string length of the content (the highest tier of content, i.e. the longest pieces, appear first on the ordered content list), with content within tiers being sorted by original order. For each value in the list, it searches the new structure for the value using the following rules in order, ignoring leading and trailing whitespace.
+1. Full tag/line: the content should consist of either an entire line in the new English structure, or the entire content for a tag.
 - for example, "foo bar" will match to "&lt;p>foo bar&lt;/p>"
 2. Partial tag/line: the content is only part of a line or tag.
 - for example, "bar" will match to "&lt;p>foo bar&lt;/p>"
@@ -277,15 +279,13 @@ The tool sorts the english content list into tiers by string length of the conte
 8. If the line or tag contains the substring "aragraph" (for "paragraph" / "Paragraph"), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
 - for example, "paragraph 234" will match to "&lt;p>paragraph 8&lt;/p>".
 
-Note that rules 3 to 8 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences.
-
-The document is searched fully for each of the above rules before moving onto the next rule. At the end, the indices of the first 100 English contents that were not found at all in the new English structure (and so failed to be mapped) are printed to the console.
+Note that rules 3 to 8 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences. The document is searched fully for each of the above rules before moving onto the next rule.
 
 Each row of the English content is only searched for once, with the first instance of the content found being replaced, but duplicate English content rows in the list are searched for independently.
 
 To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
 
-[English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-french-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
+[English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-French-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
 ### Extra translations and cleaning after doing the main mapping
 

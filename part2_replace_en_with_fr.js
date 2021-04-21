@@ -43,7 +43,7 @@ function create_fr_html() {
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
 		// replace english content in structure with french content
-		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked);
+		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked, document.getElementById("pre_post_lines").checked);
 		// download structure with french content
 		download(new_structure, "fr_html.html", "text/html");
 	}
@@ -231,10 +231,11 @@ Replace English substrings with French substrings
 ============================
 */
 
-function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct) {
+function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct, pre_post_lines) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
-	let unmatched_lines = 0;
-	console.log("Positions of unmatched lines (first 100):");
+	// keep track of which contents don't have matches
+	let unmatched_line_count = 0;
+	let unmatched_content_inds = [];
 	/*
 	============================
 	format structure and clean up math
@@ -503,19 +504,33 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		}
 		/*
 		============================
-		Debug
+		Record content as unmatched
 		============================
 		*/
-		// counter for number of unmatched lines
 		if (content_ind === -1 && curr_content !== empty_line_placeholder) {
-			if (unmatched_lines < 100) {
-				console.log(posn);
-			}
-			unmatched_lines++;
+			unmatched_line_count++;
+			unmatched_content_inds.push(posn);
 		}
 	}
-	console.log("Total unmatched lines:");
-	console.log(unmatched_lines);
+	/*
+	============================
+	Format file for unmatched lines
+	============================
+	*/
+	unmatched_content_inds.sort();
+	let unmatched_line_str = "Unmatched lines: " + unmatched_line_count;
+	for (let i = 0; i < unmatched_line_count; i++) {
+		let unmatched_posn = unmatched_content_inds[i];
+		unmatched_line_str = unmatched_line_str + "\n\n\n";
+		if ((unmatched_content_inds[i] > 0) && pre_post_lines) {
+			unmatched_line_str = unmatched_line_str + en_contents_orig[unmatched_posn - 1] + "\n>>>>>>>>>>>>>>>\n";
+		}
+		unmatched_line_str = unmatched_line_str + "===== LINE " + (unmatched_posn + 1) + ": =====\n" + en_contents_orig[unmatched_posn];
+		if ((unmatched_content_inds[i] < (ncontents - 1)) && pre_post_lines) {
+			unmatched_line_str = unmatched_line_str + "\n<<<<<<<<<<<<<<<\n" + en_contents_orig[unmatched_posn + 1];
+		}
+	}
+	download(unmatched_line_str, "unmatched_values.txt", "text/plain");
 	/*
 	============================
 	Clean up output

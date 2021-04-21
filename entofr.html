@@ -62,9 +62,12 @@
   <input type="checkbox" id="fix_punct" name="fix_punct" checked>
   <label for="fix_punct">Try to fix punctuation spacing issues</label>
   <br/>
+  <input type="checkbox" id="pre_post_lines" name="pre_post_lines" checked>
+  <label for="pre_post_lines">Include the preceding and following lines in the list of unmatched English values</label>
+  <br/>
 </form>
 <p>This tool tries to fill in the wet French document after the wet English document has been manually completed. It works on the assumptions that a) the original (non-wet) documents have similar document structures and b) the wet html documents should have identical structures. With that in mind, it replaces the English values in the wet html document with their equivalent French values.</p>
-<p>If the console (ctrl+shift+i) shows anything especially strange (0 lines, the entire document being unmatched, etc.), try clicking through the buttons more slowly (some of this is asynchronous).</p>
+<p>If the output is especially strange (e.g. the entire document being unmatched), try clicking through the buttons more slowly (some of this is asynchronous).</p>
 <p>Steps:</p>
 <ul>
   <li>Part 1 - get contents from dirty documents</li>
@@ -104,7 +107,8 @@
   <ol>
     <li>Upload the values after you've made sure they align.</li>
     <li>Upload the English document that was formatted by WET standards.</li>
-    <li>Download the French document that should now be formatted by WET standards.</li>
+    <li>Download the list of unmatched English values, and then the French document that should now be formatted by WET standards.</li>
+    <li>Go through the list of unmatched English values and, if applicable, add them into the French document manually.</li>
     <li>If the option to check for math-ignoring and math-reducing matches is selected, inline math will not prevent a match, but the math will be mispositioned to the start of the parent tag. Manually go through &lt;math&gt; tags in the cleaned French document and reposition them correctly. If you use Dreamweaver, I recommend doing this <b>before</b> applying source formatting so that the math doesn't get moved to its own line.</li>
     <li>Make sure to double check with beyond compare as usual. You may want to manually search through and remove problematic cases of the following:
       <ol>
