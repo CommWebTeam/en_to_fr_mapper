@@ -144,12 +144,10 @@ The way I visualize this while aligning in Beyond Compare is that when lining th
 Reading from left to right, we can see that the bottom two rows, where we added tags, do look like the html structure that we will want in the new French document - that is, &lt;span class="osfi-txt--italic">y&lt;/span>.
 
 I have also included short forms for the following tags because, in my experience, the majority of misalignments are because one document has an emphasized value where the other does not:
-- **<oti** or **<L** for *<span class="osfi-txt--italic"*
-- **</oti** or **<L<** for *</span*
+- **<oti** for *<span class="osfi-txt--italic"*
+- **</oti** for *</span*
 - **<otb** for *<span class="osfi-txt--bold"*
 - **</otb** for *</span*
-- **<>** for *<cite*
-- **<><** for *</cite*
 
 So the English list can also be written as
 - xyz

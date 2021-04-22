@@ -313,10 +313,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			extra_tag = extra_tag.replace("</oti", '</span');
 			extra_tag = extra_tag.replace("<otb", '<span class="osfi-txt--bold"');
 			extra_tag = extra_tag.replace("</otb", '</span');
-			extra_tag = extra_tag.replace("<L<", '</span');
-			extra_tag = extra_tag.replace("<L", '<span class="osfi-txt--italic"');
-			extra_tag = extra_tag.replace("<><", '</cite');
-			extra_tag = extra_tag.replace("<>", '<cite');
 			// add > if needed
 			if (extra_tag.slice(-1) !== ">") {
 				extra_tag = extra_tag + ">";
