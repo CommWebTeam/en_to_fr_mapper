@@ -131,7 +131,7 @@ It will produce the list
 - y
 - z
 
-To indicate that the French list has two more rows for its extra span around y, the English list should have two rows appended indicating the opening and closing span tags:
+To indicate that the French list has two more rows for its extra span around y, the English list can have two rows appended indicating the opening and closing span tags:
 - xyz
 - &lt;span class="osfi-txt--italic"
 - &lt;/span
@@ -154,21 +154,23 @@ So the English list can also be written as
 - &lt;oti
 - &lt;/oti
 
-Keep in mind that in cases where an extra opening and closing tag in the French document is next to another tag, you should still add two rows in the English content list as above, but also add an extra blank row in the French content list to maintain alignment. For example, if the English document still has the same html as above but the French document has the following html:
+A minor implementation note is that since the "no" shortform for number in English has no superscript, but n<sup>o</sup> in French does, the extra tag would result in the French content list being longer. As such, the tool replaces n<sup>o</sup> in French with a placeholder, "n_cap_sup_o_placeholder", for content alignment; this string is then converted back to n<sup>o</sup> in part 2.
 
-&lt;p>&lt;span class="osfi-txt--italic">y&lt;/span>z&lt;/p>
+##### If the extra French tag is next to another tag
+
+For cases where an extra opening and closing tag in the French document is next to another tag, the French document will only have one extra value. For example, if the English document still has the same html as above but the French document has the following html:
+
+&lt;p>&lt;span class="osfi-txt--italic">xy&lt;/span>z&lt;/p>
 
 It will produce the list
-- y
+- xy
 - z
 
-The English list should still include two extra rows indicating the French tags as shown above, while the French list should instead include an extra blank line to properly align with those tags:
+In this case, you can add ">>" at the end of the aligning English line for the extra French tag, which indicates that the extra tag should also be closed at the end of the value.
 
-- 
-- y
-- z
-
-Note that since the "no" shortform for number in English has no superscript, but n<sup>o</sup> in French does, the extra tag would result in the French content list being longer. As such, the tool replaces n<sup>o</sup> in French with a placeholder, "n_cap_sup_o_placeholder", for content alignment; this string is then converted back to n<sup>o</sup> in part 2.
+So the English list would be
+- &lt;oti>>
+- xyz
 
 #### Different positioning of text around tags
 

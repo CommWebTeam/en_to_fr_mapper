@@ -81,11 +81,16 @@
     <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by index.</li>
     <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content.
       <ul>
-        <li>If the English document has extra rows of content from having tags that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.</li>
-        <ul>
-          <li>If the English document has extra rows of content from its content coming before or after a tag differently, add blank rows to the French content until their rows align.</li>
-        </ul>
-        <li>If the French document has extra rows of content from having tags that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next row, so that the remaining content aligns.</li>
+        <li>If the English document has extra rows of content from having tags that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.
+          <ul>
+            <li>If the English document has extra rows of content from its content coming before or after a tag differently, add blank rows to the French content until their rows align.</li>
+          </ul>
+        </li>
+        <li>If the French document has extra rows of content from having tags that the English document lacks, add lines in the English content beginning with &lt; and followed by the tag that separates this row of French content from the next row, so that the remaining content aligns.
+          <ul>
+            <li>If the French document has only one extra row of content instead of two because its extra tag is next to another tag, end the equivalent line in the English content with >>.</li>
+          </ul>
+        </li>
         <ul>
           <li>If the French document has extra rows of content from its content coming before or after a tag differently:
             <ul>

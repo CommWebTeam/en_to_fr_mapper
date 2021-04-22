@@ -303,17 +303,16 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		*/
 		// get equivalent french content
 		let equiv_fr_content = fr_contents[posn];
-		// if first character in english content is <, indicating extra french tag (or differing tag start/end position), append french content at current index with tags to french content at previous index
-		if (curr_content[1] === "<") {
-			let extra_tag = curr_content;
+		// if first character in english content is <, indicating extra french tag (or differing tag start/end position), append french content at current index, with tags, to french content at previous index
+		if (curr_content[1] === "<") { // ind 0 is an escape
 			// remove escapes
-			extra_tag = extra_tag.replaceAll("\\", "");
+			let extra_tag = curr_content.replaceAll("\\", "");
 			// replace specific shorthands
 			extra_tag = extra_tag.replace("<oti", '<span class="osfi-txt--italic"');
 			extra_tag = extra_tag.replace("</oti", '</span');
 			extra_tag = extra_tag.replace("<otb", '<span class="osfi-txt--bold"');
 			extra_tag = extra_tag.replace("</otb", '</span');
-			// add > if needed
+			// close tag if needed
 			if (extra_tag.slice(-1) !== ">") {
 				extra_tag = extra_tag + ">";
 			}
@@ -322,8 +321,14 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 				fr_contents[posn + 1] = equiv_fr_content + extra_tag + fr_contents[posn + 1];
 				continue;
 			}
-			// otherwise, append current french content to previous french content
-			fr_contents[posn - 1] = fr_contents[posn - 1] + extra_tag + equiv_fr_content;
+			// create another closing tag if needed
+			let closing_tag = "";
+			if (extra_tag.slice(-2) === ">>") {
+				closing_tag = extra_tag.replace(/<(.*?)[ >].*/, "</$1>");
+				extra_tag = extra_tag.replace(">>", ">");
+			}
+			// append current french content, with tags, to previous french content
+			fr_contents[posn - 1] = fr_contents[posn - 1] + extra_tag + equiv_fr_content + closing_tag;
 			continue;
 		}
 		// escape $ from french content
