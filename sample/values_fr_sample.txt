@@ -14,7 +14,10 @@ full bold
 fgh{BOLD-CLOSE}ij==FOOTNOTE-HERE== n_sup_o_placeholder n_cap_sup_o_placeholder 1er 35e  /Eng/ /eng/ Return to footnote Footnotes Footnote
 partial1 match1
 part$ial2 match2
+content1 on1 newline1
+content2 on2 newline2
 partial3 match$3
+content3 on3 newline3
 33
 1
 55

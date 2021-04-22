@@ -113,7 +113,9 @@ Since the English document has an extra bold tag around "y", it has two extra ro
 
 #### Extra tag in the French document
 
-In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of. The user can denote in the English contents that the row consists of an extra tag for the French content using an opening &lt;, followed by the name and attributes of the tag (the closing > is optional following the tag - this should work either way).
+In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of.
+
+The user can add a row in the English contents that consists of an extra tag for the French row, using an opening &lt; followed by the name and attributes of the tag (the closing > is optional following the tag - this should work either way). The tag in the English row, and then the contents of the French row that the tag is aligned with, are appended to the previous French row.
 
 For example, if the English document has the following html:
 
@@ -166,15 +168,30 @@ It will produce the list
 - xy
 - z
 
-In this case, you can add ">>" at the end of the aligning English line for the extra French tag, which indicates that the extra tag should also be closed at the end of the value.
-
-So the English list would be
+In this case, you can add ">>" at the end of the aligning English line for the extra French tag, which indicates that the extra tag should also be closed at the end of the value. So the English list would be
 - &lt;oti>>
 - xyz
 
+##### If the extra French tag should be on a separate line
+
+For the implementation of the above cases for extra French tags, the extra French tag is described in the English list, and this tag, along with the corresponding line in the French list, is appended to the previous row in the French list. If the extra French tag should instead be on a separate line from the previous row, then this implementation will not produce the correct result.
+
+To denote the extra French tag being on a newline from the previous row, surround the tag with "<?" and "?>" when describing it in the aligned English row.
+
+For example, if the French document has the following html, corresponding to a paragraph that the English documenht lacks:
+- &lt;p>x&lt;/p>
+
+Then the French list will have this row:
+- x
+
+To align with this, the English list should have an extra row indicating the p tag:
+- &lt;?p?>
+
+Since this case is generally for extra paragraphs, lists, and so on in the French document, the extra French tag indicated in the English contents should always be closed after the French contents. So in the above example, the &lt;/p> is inserted into the structure after the &lt;p>x.
+
 #### Different positioning of text around tags
 
-Sometimes, the tags may be the same in both documents, but the text is positioned around them differently so that one document has extra text.
+Sometimes, the tags may be the same in both documents, but the text is positioned around them differently so that one document has extra tags.
 
 For example, the English document may have the following html:
 

@@ -14,7 +14,10 @@ append cite
 a{BOLD-OPEN}b{BOLD-CLOSE}c{ITALICS-OPEN}==FOOTNOTE-HERE==d{ITALICS-CLOSE}e==FOOTNOTE-HERE==
 partial match
 partial match
+<?li?>
+<?li?>
 partial match
+<?li?>
 3
 -3
 5

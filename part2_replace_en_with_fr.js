@@ -314,16 +314,21 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 			if (extra_tag.slice(-1) !== ">") {
 				extra_tag = extra_tag + ">";
 			}
-			// if extra tag indicates a later start tag in french contents, prepend current french content to next french content instead
+			// if extra tag is <!l (indicating a later start tag in french contents), prepend current french content to next french content instead
 			if (extra_tag[1] === "!" && extra_tag[2] === "l") {
 				fr_contents[posn + 1] = equiv_fr_content + extra_tag + fr_contents[posn + 1];
 				continue;
 			}
-			// create another closing tag if needed
+			// create another closing tag if closing tag marker exists, and get rid of closing tag marker
 			let closing_tag = "";
 			if (extra_tag.slice(-2) === ">>") {
 				closing_tag = extra_tag.replace(/<(.*?)[ >].*/, "</$1>");
 				extra_tag = extra_tag.replace(">>", ">");
+			}
+			// also add closing tag if extra tag should be appended to a newline, but don't get rid of the marker
+			if (extra_tag[1] === "?") {
+				closing_tag = extra_tag.replace(/<\?(.*?)[ ?>].*/, "</$1?>");
+				extra_tag = extra_tag.replace("?>", ">");
 			}
 			// append current french content, with tags, to previous french content
 			fr_contents[posn - 1] = fr_contents[posn - 1] + extra_tag + equiv_fr_content + closing_tag;
@@ -538,7 +543,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	Clean up output
 	============================
 	*/
-	// swap extra french contents resulting from differing tag start/end positions into place, and remove placeholder tags
+	// swap extra french contents resulting from differing tag start/end positions into place, and remove placeholder markers
 	struct_lines = replace_arr(struct_lines, /<!r>(.*?)(<.*?>)/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /<!r1>(.*?)(<.*?>)/g, "$2$1");
 	struct_lines = replace_arr(struct_lines, /<!r2>(.*?)(<.*?> *<.*?>)/g, "$2$1");
@@ -559,8 +564,15 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	if (fix_punct) {
 		struct_lines = struct_lines.map(fix_punctuation);
 	}
-	// add math tags back in
+	
 	let struct_str = struct_lines.join('\n');
+	// move extra french contents that should be on newlines, and remove placeholder markers
+	const newline_content = /<\?(.*)\?>(.*?)\n/g;
+	console.log(struct_str)
+	while (newline_content.test(struct_str)) {
+		struct_str = struct_str.replaceAll(newline_content, "$2\n<$1>\n");
+	}
+	// add math tags back in
 	struct_str = struct_str.replaceAll(math_open_placeholder, "<math>").replaceAll(math_close_placeholder, "</math>");
 	// if option wasn't selected and math was removed, add math back in now
 	if (!math_check) {
