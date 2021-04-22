@@ -213,11 +213,6 @@ Helper functions to work with array of cleaned structure
 ============================
 */
 
-// replace values in string array
-function replace_arr(html_array, to_replace, replacement) {
-	return html_array.map(x => x.replaceAll(to_replace, replacement));
-}
-
 // find first string in array that contains matching regex
 function regex_ind(struct_arr, regex_str) {
 	return struct_arr.findIndex(x => regex_str.test(x));
@@ -543,32 +538,30 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	Clean up output
 	============================
 	*/
+	let struct_str = struct_lines.join('\n');
 	// swap extra french contents resulting from differing tag start/end positions into place, and remove placeholder markers
-	struct_lines = replace_arr(struct_lines, /<!r>(.*?)(<.*?>)/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /<!r1>(.*?)(<.*?>)/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /<!r2>(.*?)(<.*?> *<.*?>)/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /<!r3>(.*?)(<.*?> *<.*?> *<.*?>)/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l>/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /(<[^<]*?>)([^<]*?)<!l1>/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?>)([^<]*?)<!l2>/g, "$2$1");
-	struct_lines = replace_arr(struct_lines, /(<[^<]*?> *<[^<]*?> *<[^<]*?>)([^<]*?)<!l3>/g, "$2$1");
+	struct_str = struct_str.replaceAll(/<!r>(.*?)(<.*?>)/g, "$2$1");
+	struct_str = struct_str.replaceAll(/<!r1>(.*?)(<.*?>)/g, "$2$1");
+	struct_str = struct_str.replaceAll(/<!r2>(.*?)(<.*?> *<.*?>)/g, "$2$1");
+	struct_str = struct_str.replaceAll(/<!r3>(.*?)(<.*?> *<.*?> *<.*?>)/g, "$2$1");
+	struct_str = struct_str.replaceAll(/(<[^<]*?>)([^<]*?)<!l>/g, "$2$1");
+	struct_str = struct_str.replaceAll(/(<[^<]*?>)([^<]*?)<!l1>/g, "$2$1");
+	struct_str = struct_str.replaceAll(/(<[^<]*?> *<[^<]*?>)([^<]*?)<!l2>/g, "$2$1");
+	struct_str = struct_str.replaceAll(/(<[^<]*?> *<[^<]*?> *<[^<]*?>)([^<]*?)<!l3>/g, "$2$1");
 	// translate english link formattings and footnotes using gen_dw_format functions
-	struct_lines = struct_lines.map(translate_to_fr);
-	struct_lines = struct_lines.map(add_fr_num_superscript);
-	struct_lines = replace_arr(struct_lines, "</a>,</sup><sup", "</a> </sup><sup");
+	struct_str = translate_to_fr(struct_str);
+	struct_str = add_fr_num_superscript(struct_str);
+	struct_str = struct_str.replaceAll("</a>,</sup><sup", "</a> </sup><sup");
 	// fix multispace if selected
 	if (fix_multispace) {
-		struct_lines = replace_arr(struct_lines, / *&nbsp; */g, "&nbsp;");
+		struct_str = struct_str.replaceAll(/ *&nbsp; */g, "&nbsp;");
 	}
 	// fix punctuation if selected
 	if (fix_punct) {
-		struct_lines = struct_lines.map(fix_punctuation);
+		struct_str = fix_punctuation(struct_str);
 	}
-	
-	let struct_str = struct_lines.join('\n');
 	// move extra french contents that should be on newlines, and remove placeholder markers
 	const newline_content = /<\?(.*)\?>(.*?)\n/g;
-	console.log(struct_str)
 	while (newline_content.test(struct_str)) {
 		struct_str = struct_str.replaceAll(newline_content, "$2\n<$1>\n");
 	}
