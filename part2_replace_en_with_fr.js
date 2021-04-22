@@ -42,10 +42,8 @@ function create_fr_html() {
 		structure = format_spacing(structure);
 		// read in other inputs for matching contents to structure
 		const min_cont_len = parseInt(document.getElementById("min_content_len").value);
-		// replace english content in structure with french content
-		new_structure = replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked, document.getElementById("pre_post_lines").checked);
-		// download structure with french content
-		download(new_structure, "fr_html.html", "text/html");
+		// replace english content in structure with french content, and download the french structure
+		replace_en_with_fr(structure, en_contents, fr_contents, min_cont_len, document.getElementById("alpha_list").checked, document.getElementById("math_check").checked, document.getElementById("fix_multispace").checked, document.getElementById("fix_punct").checked, document.getElementById("pre_post_lines").checked);
 	}
 	file_reader_en_struct.readAsText(struct_str_en);
 }
@@ -520,18 +518,21 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	*/
 	unmatched_content_inds.sort();
 	let unmatched_line_str = "Unmatched lines: " + unmatched_line_count;
+	// loop through unmatched lines
 	for (let i = 0; i < unmatched_line_count; i++) {
 		let unmatched_posn = unmatched_content_inds[i];
 		unmatched_line_str = unmatched_line_str + "\n\n\n";
+		// print previous line if needed
 		if ((unmatched_content_inds[i] > 0) && pre_post_lines) {
 			unmatched_line_str = unmatched_line_str + en_contents_orig[unmatched_posn - 1] + "\n>>>>>>>>>>>>>>>\n";
 		}
+		// print current line with line number
 		unmatched_line_str = unmatched_line_str + "===== LINE " + (unmatched_posn + 1) + ": =====\n" + en_contents_orig[unmatched_posn];
+		// print following line if needed
 		if ((unmatched_content_inds[i] < (ncontents - 1)) && pre_post_lines) {
 			unmatched_line_str = unmatched_line_str + "\n<<<<<<<<<<<<<<<\n" + en_contents_orig[unmatched_posn + 1];
 		}
 	}
-	download(unmatched_line_str, "unmatched_values.txt", "text/plain");
 	/*
 	============================
 	Clean up output
@@ -570,5 +571,9 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	// add br back in
 	struct_str = struct_str.replaceAll(br_placeholder, " <br />\n");
 	// fix french apostrophes and remove empty line placeholders
-	return struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
+	struct_str = struct_str.replaceAll("'", "’").replaceAll(empty_line_placeholder, "");
+	// download structure with french content
+	download(struct_str, "fr_html.html", "text/html");
+	// download unmatched lines
+	download(unmatched_line_str, "unmatched_values.txt", "text/plain");
 }
