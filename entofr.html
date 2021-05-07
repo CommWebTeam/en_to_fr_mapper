@@ -81,8 +81,14 @@
   </ol>
   <li>Part 1.5 - making sure the contents align -</li>
   <ol start="7">
-    <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by index.</li>
-    <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content.
+    <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by <b>index</b>.</li>
+    <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content. <br />
+      Some tips if you are using Beyond Compare to align values:
+      <ul>
+        <li>Go to Session -> Session Settings -> Alignment and set the values to Unaligned so that the rows are aligned by index.</li>
+        <li>Make sure to save and reload after every change you make so that you can visually keep track of how the rows are aligned (unless you can follow it on your own), since each of your edits will dealign the rows.</li>
+      </ul>
+      The alignment process is as follows:
       <ul>
         <li>If the English document has extra rows of content from having tags that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.
           <ul>
@@ -103,11 +109,6 @@
           </li>
         </ul>
         <li>If the documents have different tags at the same index but are otherwise aligned, you can treat it as the English document having extra rows followed by the French document having extra rows.</li>
-      </ul>
-      Some tips if you are using Beyond Compare to align values:
-      <ul>
-        <li>Go to Session -> Session Settings -> Alignment and set the values to Unaligned so that the rows are aligned by index.</li>
-        <li>Make sure to save and reload after every change you make so that you can visually keep track of how the rows are aligned (unless you can follow it on your own), since each of your edits will dealign the rows.</li>
       </ul>
     </li>
   </ol>
