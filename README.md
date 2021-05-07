@@ -6,12 +6,12 @@ A string mapper that restructures a French html document based on its English co
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
 *Table of Contents*
-- [English to French mapper](#English-to-French-mapper)
+- [English to French mapper](#english-to-french-mapper)
 - - [Overview](#English-to-French-mapper)
 - - [Part 1](#part-1)
-- - - [Aligning values](#English-to-French-mapper)
-- - - - [Extra English tags](#extra-tag-in-the-English-document)
-- - - - [Extra French tags](#extra-tag-in-the-French-document)
+- - - [Aligning values](#english-to-french-mapper)
+- - - - [Extra English tags](#extra-tag-in-the-english-document)
+- - - - [Extra French tags](#extra-tag-in-the-french-document)
 - - - - [Different positioning of text around tags](#different-positioning-of-text-around-tags)
 - - - - [Scanning for differences](#scanning-for-differences)
 - - - - [Markers](#markers)

@@ -68,7 +68,7 @@
 </form>
 <p>This tool tries to fill in the wet French document after the wet English document has been manually completed. It works on the assumptions that a) the original (non-wet) documents have similar document structures and b) the wet html documents should have identical structures. With that in mind, it replaces the English values in the wet html document with their equivalent French values.</p>
 <p>If the output is especially strange (e.g. the entire document being unmatched), try clicking through the buttons more slowly (some of this is asynchronous).</p>
-<p>Steps:</p>
+<p>Steps (examples and so on can be found in the <a href="https://commwebteam.github.io/en_to_fr_mapper/#part-1" rel="external">readme</a>):</p>
 <ul>
   <li>Part 1 - get contents from dirty documents</li>
   <ol>
@@ -78,6 +78,9 @@
     <li>Paste these Word documents as HTML files into the Dreamweaver design view in separate files.</li>
     <li>Upload these two HTML files.</li>
     <li>Download the values that are generated (these are the html documents with the tags removed).</li>
+  </ol>
+  <li>Part 1.5 - making sure the contents align -</li>
+  <ol start="7">
     <li>Make sure there are exactly the same number of English and French values (number of values is printed in the console - ctrl+shift+i) since the next part matches by index.</li>
     <li>If they don't, manually align the rows so that each line of English content is on the same row as the corresponding French content.
       <ul>
