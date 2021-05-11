@@ -8,6 +8,7 @@ This was originally intended to be used with word documents pasted into Dreamwea
 *Table of Contents*
 - [English to French mapper](#english-to-french-mapper)
 - - [Overview](#English-to-French-mapper)
+- - - [Inputs](#description-of-inputs)
 - - [Part 1](#part-1)
 - - - [Aligning values](#english-to-french-mapper)
 - - - - [Summary of misalignment cases](#brief-summary-of-misalignment-cases)
@@ -18,6 +19,7 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - - - - [Markers](#4.1-markers)
 - - [Part 2](#part-2)
 - - - [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
+- - - [List numberings](#list-numberings)
 - - - [Math](#math)
 - - [Beyond comparing](#English-to-French-mapper)
 
@@ -25,19 +27,116 @@ This was originally intended to be used with word documents pasted into Dreamwea
 
 We usually work with both English and French translations of the same document, and ideally, the structures of their word documents should be the same. The intention of this tool is for the user to only have to manually clean the English translation of the document to standards; the tool can then do most of the work for creating a cleaned French translation of the document.
 
-Input:
-- the French html document with the old structure (the word document pasted into Dreamweaver)
-- the equivalent English html document with the old structure
-- the same English html document with the new, manually cleaned structure
-
-Output:
-- the French html document with the new structure
-
 Using this tool is broken into two parts. In short:
 1. the first part creates two lists of contents from the old structure, one for the English contents and one for the French contents.
 2. The second part searches for each English content in the new (English) structure, and replaces it with the equivalent French content by index.
 
+Input:
+- the French html document with the old structure (the word document pasted into Dreamweaver)
+- the equivalent English html document with the old structure (the word document pasted into Dreamweaver)
+- the above English html document but with the new, manually cleaned structure
+
+Output:
+- the French html document with the new structure
+- a text file listing the English contents that failed to be found and mapped
+
 This idea could be used in reverse (restructuring an English document based on its French counterpart), but for the time being, the tool has some specific implementations that assume the translation is done from English to French.
+
+### Description of Inputs
+
+#### 1. Part 1 - Dreamweaver pastes of English and French documents
+
+These are the Word documents that have been pasted into Dreamweaver. They should follow Dreamweaver formatting.
+
+For more complicated documents, you may have to follow these steps and format the Word document first to ensure that you have copied everything over correctly:
+
+1. In Word, stop tracking changes and delete comments.
+2. If there are any text boxes (that can't be copied), move their text out. [You can use the (second) macro here for this.](https://word.tips.net/T001690_Removing_All_Text_Boxes_In_a_Document.html)
+3. Mark any superscripts or subscripts in the Word document - by default, these stylings aren't copied into Dreamweaver. Do so in the same manner as for the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/#details-on-changing-strings-indicating-tags-to-actual-tags) (I use the same code for some initial cleanup).
+
+Paste these Word documents as HTML files into the Dreamweaver design view in separate files. You don't have to run the general Dreamweaver formatting tool on them first (though you can), because part 1 of this tool calls the required formatting functions already.
+
+#### 2. Part 1 - inserting markers
+
+This inserts some markers into the content lists for part 1; I find these markers helpful for scanning through the content lists to search for misaligned rows more quickly.
+
+They are automatically removed in part 2, so you don't need to add or remove them yourself.
+
+Details [here](#4.1-markers).
+
+#### 3. Part 1 - removing br tags inside tables
+
+I have noticed that in some cases, a large number of contents fail to be mapped because of &lt;br> tags inside table values. This is because the &lt;br> tag breaks a value into two content rows instead of one, which makes the content more difficult to map. As such, I have included an option that removes all &lt;br> tags between table tags.
+
+For example, <span style="color:red">&lt;table>&lt;td>a &lt;br> b&lt;/td>&lt;/table></span> becomes <span style="color:green">&lt;table>&lt;td>a b&lt;/td>&lt;/table></span>.
+
+#### 4. Part 2 - aligned English and French values
+
+These are the English and French content rows downloaded in part 1 that have been aligned to each other by index, meaning that each row in the English content list maps to the same row in the French content list.
+
+#### 5. Part 2 - cleaned English HTML
+
+This is the cleaned English structure. Each English content row from the previous input will be searched for and replaced by its aligning French content row.
+
+#### 6. Part 2 - minimum string length for partial content matches
+
+When searching for English contents in the cleaned English structure, the preference is to match the content to an entire tag or line in the document. For example, if a content row consists of "<span style="color:red">this is a full value</span>", then it will map a tag in the cleaned structure for <span style="color:red">&lt;b>this is a full value&lt;/b></span>.
+
+The tool also searches for strings that find a partial match, meaning the content row only matches part of a tag, not the entire tag. For example, a content row consisting of "<span style="color:red">this is a</span>" will only map part of the above tag. These searches for partial matches are more likely to find false positives by replacing values in the English structure that they aren't supposed to.
+
+To limit these false positives, English content rows are roughly sorted by length in descending order, meaning longer content rows are usually searched for and replaced first.
+
+To further limit these false positives, searching for partial matches requires the content being searched for to be the given minimum string length. This value is 10 by default, meaning an English content row must consist of at least 10 characters for partial matches to be searched for.
+
+Note that for search types that require a minimum string length, case is also ignored in the search, since the minimum string length is usually enough to make false positives unlikely. Other search types do require case to match.
+
+#### 7. Part 2 - match alpha lists
+
+One of the search types when searching for English content rows in the cleaned English structure is to ignore numeric and roman numeral list numberings in the content row. For example, the content row "<span style="color:red">1. List point</span>" will successfully map to the tag <span style="color:red">&lt;li>List point&lt;/li></span>, even though the tag doesn't have the numeric list numbering "1.".
+
+The content row "<span style="color:red">IV. List point</span>" will also successfully map to the tag <span style="color:red">&lt;li>List point&lt;/li></span>, ignoring the roman list numbering "IV.".
+
+Allowing matching alpha lists means that alphabet characters can also be used for list numberings, so the content row "<span style="color:red">A. List point</span>" will also successfully map to the tag <span style="color:red">&lt;li>List point&lt;/li></span>, ignoring the list numbering "A.". This is optional because it is more likely to result in false positives than numeric or roman list numberings.
+
+See the [list numberings](#list-numberings) section in part 2 for more details.
+
+#### 8. Part 2 - try to do matches in mathml
+
+If checked, the tool tries to handle &olt;math> tags when searching for English content rows. This may require you to manually reposition math tags afterwards. See the [math](#math) section in part 2 for details.
+
+#### 9. Post-mapping cleaning - remove multispaces
+
+If checked, then after the mapping of the content rows is complete, the tool removes any spaces surrounding &amp;nbsp;, which I have found to be a common formatting error introduced by the mapper. For example, "<span style="color:red"> nbsp; </span>" is trimmed to  "<span style="color:red">nbsp;</span>".
+
+#### 10. Post-mapping cleaning - fix punctuation and spacing issues
+
+If checked, then after the mapping of the content rows is complete, the fix_punctuation function from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/) is called. I have found that the mapper often introduces punctuation issues when punctuation is on different sides of tags in the English and French documents (e.g. if a period is bolded in the English document but not the French document). 
+
+#### 11. Post-mapping cleaning - including surrounding lines for unmatched contents
+
+Along with the cleaned HTML structure that is ideally now populated with French values, the tool also provides a text file listing the English content rows that were not successfully matched. This is just to help you find and fix the problematic lines; you are free to ignore it if finding the unmatched lines with Beyond Compare is easier.
+
+If this option not checked, then the lines will be listed on their own using the following formatting:
+<div style="color:green"> <br />
+===== <span style="color:red">line number of the unmatched line</span> ===== <br />
+<span style="color:red">contents of the unmatched line</span> <br />
+</div>  <br />
+
+e.g.
+
+===== 5 ===== <br />
+Unmatched line here
+
+If the option is checked, then the surrounding lines will also be included before and after the unlisted lines. Each unmatched line in the text file will be formatted as follows:
+
+<div style="color:green">
+<span style="color:red">contents of the line preceding unmatched line</span> <br />
+>>>>>>>>>>>>>>> <br />
+===== <span style="color:red">line number of the unmatched line</span> ===== <br />
+<span style="color:red">contents of the unmatched line</span> <br />
+<<<<<<<<<<<<<<< <br />
+<span style="color:red">contents of the line following unmatched line</span> <br />
+</div>  <br />
 
 ## Part 1:
 Extract lists of the English and French contents from the old structures created by the Dreamweaver pastes (after slightly cleaning up their formatting using some functions from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/)).
@@ -283,7 +382,9 @@ I have included an option that, if selected, adds markers to aid in scanning for
 - The marker ==FOOTNOTE-HERE== is added in positions where footnotes would be.
 - The markers {ITALICS-OPEN}, {ITALICS-CLOSE}, {BOLD-OPEN}, and {BOLD-CLOSE} are added for opening / closing italics and bold tags.
 
-These markers are automatically removed in part 2.
+These markers are automatically removed in part 2, so the tool ignores them completely. You do not have to remove them yourself. They are NOT a substitute for extra tags since the tool ignores them.
+
+These markers are purely to help with scanning through the content list. If you find them distracting, you can turn them off. 
 
 ## Part 2:
 Using the manually realigned outputs from part 1 as inputs, the tool maps French contents from the old structure onto the new English structure. As described in [part 1](#part-1), this is done by finding each value in the list of English content in the new English structure, and replacing it with the same indexed value in the list of French content.
@@ -314,17 +415,26 @@ Note that rules 3 to 8 are checked one-by-one and mostly independently of each o
 
 Each row of the English content is only searched for once, with the first instance of the content found being replaced, but duplicate English content rows in the list are searched for independently.
 
-To prevent false positives, some of these rules require the content being searched for to be a minimum string length (as the user inputs). For the rules that require a minimum string length, case is also ignored in the search.
-
 [English content rows indicating extra French tags, as described in part 1](#extra-tag-in-the-French-document), are treated independently of the rest of the content list. The appropriate tags containing the corresponding French contents are appended to the preceding row of the French content list. This is done before any of the regular content has been mapped.
 
 ### Extra translations and cleaning after doing the main mapping
 
-English links to the OSFI website and English WET footnotes are converted into French. All apostrophes ' are replaced with ’.
+The following extra steps are taken after the mapping:
+- English links to the OSFI website and English WET footnotes are converted into French.
+- All apostrophes ' are replaced with ’.
+- French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
+- If the option to fix spacing around punctuation is selected, then the fix_punctuation function from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/) is called.
 
-French numberings (1er, 2e, 3e, etc.) have their suffixes automatically searched for and converted to superscripts if this is not already the case.
 
-If the option to fix spacing around punctuation is selected, then the fix_punctuation function from the [general Dreamweaver formatting tool](https://commwebteam.github.io/gen_dw_format/dreamweaver_paste_formatter/) is called.
+### List numberings
+
+Rule 3 ignores list numberings in the English content list. List numberings consist of [numeric / roman / alpha] values and at least one period "." or closing bracket ")". Examples of valid roman list numberings are as follows:
+- III) List value
+- IV.V List value
+- I.I.I. List value
+
+However, the following does not count as a list numbering:
+- III List value
 
 ### Math
 
