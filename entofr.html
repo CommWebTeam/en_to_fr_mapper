@@ -17,7 +17,7 @@
     <br />
     <br />
   <input type="checkbox" id="insert_markers" name="insert_markers" checked>
-  <label for="insert_markers">Insert placeholder markers over footnotes/italics/bold (automatically ignored in part 2)</label>
+  <label for="insert_markers">Insert placeholder markers over footnotes/italics/bold: "==FOOTNOTE-HERE==", "{BOLD-OPEN}", "{ITALIC-OPEN}" (these placeholders are automatically ignored in part 2)</label>
     <br />
     <input type="checkbox" id="remove_br" name="remove_br">
   <label for="remove_br">Remove &lt;br> tags inside tables</label>
@@ -49,7 +49,7 @@
 <form>
   Minimum content length for partial matches (content is found in part of a tag/line, but the tag/line doesn't consist entirely of it):
   <input id="min_content_len" type="number" value="10" />
-  times <br />
+  characters <br />
   <input type="checkbox" id="alpha_list" name="alpha_list" checked>
   <label for="alpha_list">Match alpha list contents (not just numeric / roman)</label>
   <br />

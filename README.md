@@ -10,11 +10,12 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - - [Overview](#English-to-French-mapper)
 - - [Part 1](#part-1)
 - - - [Aligning values](#english-to-french-mapper)
-- - - - [Extra English tags](#extra-tag-in-the-english-document)
-- - - - [Extra French tags](#extra-tag-in-the-french-document)
-- - - - [Different positioning of text around tags](#different-positioning-of-text-around-tags)
-- - - - [Scanning for differences](#scanning-for-differences)
-- - - - [Markers](#markers)
+- - - - [Summary of misalignment cases](#brief-summary-of-misalignment-cases)
+- - - - [Extra English tags](#1.-extra-tag-in-the-english-document)
+- - - - [Extra French tags](#2.-extra-tag-in-the-french-document)
+- - - - [Different positioning of text around tags](#3.-different-positioning-of-text-around-tags)
+- - - - [Scanning for differences](#4.-scanning-for-differences)
+- - - - - [Markers](#4.1-markers)
 - - [Part 2](#part-2)
 - - - [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
 - - - [Math](#math)
@@ -84,9 +85,22 @@ Ideally, the old structure documents will have the exact same html structure in 
 
 I personally use Beyond Compare to align the values since it nicely lays out the two lists side-by-side. To make this easier, go to Session -> Session Settings -> Alignment and set the files to Unaligned. Make sure to save and reload after every edit you make to either of the files so that the rows of the two files continue to align (since each time you add a line to one of the files, they will dealign).
 
-There are two cases for when there are differing numbers of tags in the similar structures of the English and French documents (resulting in values not aligning correctly): the English document having an extra tag, or the French document having an extra tag. (If the two documents have different tags in the same location, this can be treated as the English document having an extra tag followed by the French document having an extra tag.)
+#### Brief summary of misalignment cases
 
-#### Extra tag in the English document
+Extra English content:
+- If the English document has extra rows of content from having tags that the French document lacks, add blank rows to the French content so that its contents align with the English content before and after the extra rows.
+- If the English document has extra rows of content from its content coming before or after a tag differently, add blank rows to the French content until their rows align.
+
+Extra French content:
+- If the French document has extra rows of content from having tags that the English document lacks, add lines in the English content beginning with < and followed by the tag that separates this row of French content from the next row, so that the remaining content aligns.
+- If the French document has only one extra row of content instead of two because its extra tag is next to another tag, end the equivalent line in the English content with >>.
+- If the French document has extra rows of content from its content coming before or after a tag differently:
+    - Add a row with the placeholder tag <!r in the English contents to indicate that the equivalent French row should be pushed one tag behind, <!r2 to push it two tags behind, or <!r3 to push it three tags behind.
+    = Add a row with the placeholder tag <!l in the English contents to indicate that the equivalent French row should be pushed one tag in front, <!l2 to push it two tags in front, or <!l3 to push it three tags in front.
+
+Below is a detailed explanation of what to do for each misalignment case.
+
+#### 1. Extra tag in the English document
 
 In the first case, blank rows can be added in the French contents until the values properly align again. This way, the extra tags in the English document will be mapped to blank values.
 
@@ -111,7 +125,7 @@ Since the English document has an extra bold tag around "y", it has two extra ro
 - 
 - 
 
-#### Extra tag in the French document
+#### 2. Extra tag in the French document
 
 In the reverse case, extra rows will instead have to be added to the English content list to align it with the French content list. The cleaned English structure won't contain the extra tags in the French document, so the user will have to indicate what the extra French tags consist of.
 
@@ -158,7 +172,7 @@ So the English list can also be written as
 
 A minor implementation note is that since the "no" shortform for number in English has no superscript, but n<sup>o</sup> in French does, the extra tag would result in the French content list being longer. As such, the tool replaces n<sup>o</sup> in French with a placeholder, "n_cap_sup_o_placeholder", for content alignment; this string is then converted back to n<sup>o</sup> in part 2.
 
-##### If the extra French tag is next to another tag
+##### 2.1. If the extra French tag is next to another tag
 
 For cases where an extra opening and closing tag in the French document is next to another tag, the French document will only have one extra value. For example, if the English document still has the same html as above but the French document has the following html:
 
@@ -172,7 +186,7 @@ In this case, you can add ">>" at the end of the aligning English line for the e
 - &lt;oti>>
 - xyz
 
-##### If the extra French tag should be on a separate line
+##### 2.2. If the extra French tag should be on a separate line
 
 For the implementation of the above cases for extra French tags, the extra French tag is described in the English list, and this tag, along with the corresponding line in the French list, is appended to the previous row in the French list. If the extra French tag should instead be on a separate line from the previous row, then this implementation will not produce the correct result.
 
@@ -189,7 +203,7 @@ To align with this, the English list should have an extra row indicating the p t
 
 Since this case is generally for extra paragraphs, lists, and so on in the French document, the extra French tag indicated in the English contents should always be closed after the French contents. So in the above example, the &lt;/p> is inserted into the structure after the &lt;p>x.
 
-#### Different positioning of text around tags
+#### 3. Different positioning of text around tags
 
 Sometimes, the tags may be the same in both documents, but the text is positioned around them differently so that one document has extra tags.
 
@@ -226,7 +240,7 @@ So for the above example, the English list should be changed to
 
 indicating that "xyz (1)" in the English content aligns with "xyz" in the French content, and "(1)" in the French content should be pushed back to one tag after "xyz", in this case to behind the "&lt;/em>".
 
-#### Scanning for differences
+#### 4. Scanning for differences
 
 In general, the English and French documents should have roughly similar contents in terms of length and location, so visually scanning through for jarring differences between the two content lists may be much faster than comparing line by line.
 
@@ -262,7 +276,7 @@ Outside of comparing content lengths, other quick visual inspections are useful 
 
 Again, if you are using Beyond Compare, I recommend reloading after every edit so that the rows are always aligned correctly by index; this makes visual inspections like these much easier to perform.
 
-#### Markers
+##### 4.1. Markers
 
 I have included an option that, if selected, adds markers to aid in scanning for where misalignments are occurring:
 
