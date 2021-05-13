@@ -69,7 +69,7 @@ function strip_html(html_str, insert_markers, remove_br) {
 	// replace n<sup>o</sup> with a placeholder (since it won't be mapped)
 	clean_html_str = clean_html_str.replaceAll("n&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no);
 	clean_html_str = clean_html_str.replaceAll("N&lt;sup&gt;o&lt;/sup&gt;", fr_placeholder_sup_no_cap);
-	// use functions from basic_format to perform basic cleaning on Dreamweaver paste
+	// use functions from general dreamweaver formatting to perform basic cleaning on Dreamweaver paste
 	clean_html_str = rm_ref_links(clean_html_str);
 	clean_html_str = rm_toc_links(clean_html_str);
 	clean_html_str = rm_bookmark_links(clean_html_str);
