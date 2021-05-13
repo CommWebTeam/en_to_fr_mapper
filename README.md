@@ -1,7 +1,7 @@
 # English to French mapper
 A string mapper that restructures a French html document based on its English counterpart.
 
-[HTML page of tool here.](https://commwebteam.github.io/en_to_fr_mapper/#english-to-french-mapper)
+[HTML page of tool here.](https://commwebteam.github.io/en_to_fr_mapper/)
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
