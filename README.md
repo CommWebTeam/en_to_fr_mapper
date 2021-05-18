@@ -357,7 +357,7 @@ So it would produce the list
 
 In the case where the English content list has extra rows from differently positioned text, you can just add blank rows to the French content list until they align. This is the same as for extra English content rows that arise from extra tags in the English document.
 
-In the above example, however, it is instead the French document that has extra content rows from differently positioned text. The first two content rows align fine, but the third <span style="color:green">carnivore</span> row in the French contents should be after the `</a>`, not before.
+In the above example, however, it is instead the French document that has extra content rows from differently positioned text. The first two content rows align fine, but the third <span style="color:green">carnivore</span> row in the French contents should be after the closing `</a>` rather than before, since we want `(Felis silvestris), <a>mammifère</a> carnivore` instead of `(Felis silvestris), <a>mammifère carnivore</a>`.
 
 For this case, I have included placeholder tags to put into the English content rows indicating that the corresponding French content should be swapped around adjacent tags. These are used similarly to how you would add extra English content rows for extra French tags.
 - **&lt;!r** or **&lt;!r1** indicates that the French content should be moved one tag later; this is what should be used in the above example.
