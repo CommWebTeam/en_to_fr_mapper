@@ -5,23 +5,25 @@ A string mapper that restructures a French html document based on its English co
 
 This was originally intended to be used with word documents pasted into Dreamweaver. The Dreamweaver-generated html documents do not usually conform to WCAG/WET standards; we have to manually edit the html document so that it meets these standards before we can upload the document to the web.
 
-*Table of Contents*
-- [English to French mapper](#english-to-french-mapper)
-- - [Overview](#English-to-French-mapper)
-- - - [Inputs](#description-of-inputs)
-- - [Part 1](#part-1)
-- - - [Aligning values](#english-to-french-mapper)
-- - - - [Summary of misalignment cases](#brief-summary-of-misalignment-cases)
-- - - - [Extra English tags](#1.-extra-tag-in-the-english-document)
-- - - - [Extra French tags](#2.-extra-tag-in-the-french-document)
-- - - - [Different positioning of text around tags](#3.-different-positioning-of-text-around-tags)
-- - - - [Scanning for differences](#4.-scanning-for-differences)
-- - - - - [Markers](#4.1-markers)
-- - [Part 2](#part-2)
-- - - [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
-- - - [List numberings](#list-numberings)
-- - - [Math](#math)
-- - [Beyond comparing](#English-to-French-mapper)
+# Table of Contents
+[Overview](#English-to-French-mapper)
+- [Inputs](#description-of-inputs)
+
+[Part 1](#part-1)
+- [Aligning values](#english-to-french-mapper)
+- - [Summary of misalignment cases](#brief-summary-of-misalignment-cases)
+- - [Extra English tags](#1.-extra-tag-in-the-english-document)
+- - [Extra French tags](#2.-extra-tag-in-the-french-document)
+- - [Different positioning of text around tags](#3.-different-positioning-of-text-around-tags)
+- - [Scanning for differences](#4.-scanning-for-differences)
+- - - [Markers](#4.1-markers)
+
+[Part 2](#part-2)
+- [Extra translations and cleaning after doing the main mapping](#extra-translations-and-cleaning-after-doing-the-main-mapping)
+- [List numberings](#list-numberings)
+- [Math](#math)
+
+[Beyond comparing](#English-to-French-mapper)
 
 ## Overview
 
@@ -199,13 +201,13 @@ Extra English content:
 
 Extra French content:
 - If the French document has extra rows of content from having tags that the English document lacks, add lines in the English content beginning with < and followed by the tag that separates this row of French content from the next row, so that the remaining content aligns.
-    - If the French document has only one extra row of content instead of two because its extra tag is next to another tag, end the tag on the equivalent line in the English content with >>.
+    - If the French document has only one extra row of content instead of two because its extra tag is next to another tag, end the tag on the equivalent line in the English content with >>. (Note: this is two separate ">" characters, not one "»" character.)
     - If the French document has an extra row of content that should be appended to a brand new line, surround the tag on the equivalent line in the English content with &lt;? and ?>.
 - If the French document has extra rows of content from its content coming before or after a tag differently:
     - Add a row with the placeholder tag <!r in the English contents to indicate that the equivalent French row should be pushed one tag behind, <!r2 to push it two tags behind, or <!r3 to push it three tags behind.
     = Add a row with the placeholder tag <!l in the English contents to indicate that the equivalent French row should be pushed one tag in front, <!l2 to push it two tags in front, or <!l3 to push it three tags in front.
 
-Below is a detailed explanation of what to do for each misalignment case.
+Below is a detailed explanation of what to do for each misalignment case. Note that for brevity, the example lists below do not include [optional markers](#4.1-markers).
 
 #### 1. Extra tag in the English document
 
@@ -306,6 +308,8 @@ In this case, you can add ">>" at the end of the aligning English line for the e
 - <span style="color:red">&lt;oti>></span>
 - <span style="color:red">The domestic cat is a member of the Felidae, a family that had a common ancestor about 10–15 million years ago.</span>
 
+Note that this is two separate ">" characters, not one "»" character.
+
 The tool will add `<span class="osfi-txt--italic>` in front of "The domestic cat", and `</span>` after "million years ago".
 
 ##### 2.2. If the extra French tag should be on a separate line
@@ -332,7 +336,7 @@ Since this case is generally for extra paragraphs, lists, and so on in the Frenc
 
 #### 3. Different positioning of text around tags
 
-Sometimes, the tags may be the same in both documents, but the text is positioned around them differently so that one document has extra tags.
+Sometimes, the tags may be the same in both documents, but the text is positioned around these tags differently so that one document has extra rows of content.
 
 For example, the English document may have the following html:
 
@@ -443,7 +447,7 @@ The tool sorts the English content list into tiers by string length of the conte
 - for example, "foo x bar" will match to `<p>foo <math><mi>x</mi></math> bar</p>`.
 7. All differences between non-alphanumeric characters ignored (but the positions of the non-alphanumeric characters have to be the same).
 - for example, "foo-bar" will match to `<p>foo bar</p>`.
-8. If the line or tag contains the substring "aragraph" (for "paragraph" / "Paragraph"), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
+8. If the line or tag contains the substring "aragraph" (for "paragraph", "Paragraph", "paragraphe", and so on), ignores differences in numbers, so that differing paragraph numbers won't prevent a match.
 - for example, "paragraph 234" will match to `<p>paragraph 8</p>`.
 
 Note that rules 3 to 8 are checked one-by-one and mostly independently of each other, meaning a match cannot follow multiple rules (e.g. if a row of content can only be matched if both list numberings are removed and math tags are ignored, then it will not be matched). An exception is that a few of the later checks also ignore spacing differences. The document is searched fully for each of the above rules before moving onto the next rule.
