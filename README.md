@@ -1,6 +1,5 @@
 # English to French mapper
 A string mapper that restructures a French html document based on its English counterpart.
-a
 
 [HTML page of tool here.](https://commwebteam.github.io/en_to_fr_mapper/entofr.html)
 
