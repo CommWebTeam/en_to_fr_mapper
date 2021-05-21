@@ -227,15 +227,13 @@ Replace English substrings with French substrings
 function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len, alpha_list, math_check, fix_multispace, fix_punct, pre_post_lines) {
 	const ncontents = Math.min(en_contents.length, fr_contents.length);
 	// keep track of which contents don't have matches
-	let unmatched_line_count = 0;
 	let unmatched_content_inds = [];
 	/*
 	============================
 	format structure and clean up math
 	============================
 	*/
-	// get rid of special characters
-	let cleaned_structure = replace_special_chars(en_structure).replaceAll("\r\n", "\n");
+	let cleaned_structure = en_structure.replaceAll("\r\n", "\n");
 	// replace br with placeholders
 	cleaned_structure = cleaned_structure.replaceAll(/([\s]|\n)*<br[ \/]*>([\s]|\n)*/g, br_placeholder);
 	// remove empty math equations
@@ -507,7 +505,6 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 		============================
 		*/
 		if (content_ind === -1 && curr_content !== empty_line_placeholder) {
-			unmatched_line_count++;
 			unmatched_content_inds.push(posn);
 		}
 	}
@@ -517,6 +514,7 @@ function replace_en_with_fr(en_structure, en_contents, fr_contents, min_cont_len
 	============================
 	*/
 	unmatched_content_inds.sort();
+	unmatched_line_count = unmatched_content_inds.length;
 	let unmatched_line_str = "Unmatched lines: " + unmatched_line_count;
 	// loop through unmatched lines
 	for (let i = 0; i < unmatched_line_count; i++) {
