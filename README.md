@@ -10,12 +10,12 @@ This was originally intended to be used with word documents pasted into Dreamwea
 - [Inputs](#description-of-inputs)
 
 [Part 1](#part-1)
-- [Aligning values](#english-to-french-mapper)
+- [Aligning values](#aligning-values)
 - - [Summary of misalignment cases](#brief-summary-of-misalignment-cases)
-- - [Extra English tags](#1.-extra-tag-in-the-english-document)
-- - [Extra French tags](#2.-extra-tag-in-the-french-document)
-- - [Different positioning of text around tags](#3.-different-positioning-of-text-around-tags)
-- - [Scanning for differences](#4.-scanning-for-differences)
+- - [Extra English tags](#1-extra-tag-in-the-english-document)
+- - [Extra French tags](#2-extra-tag-in-the-french-document)
+- - [Different positioning of text around tags](#3-different-positioning-of-text-around-tags)
+- - [Scanning for differences](#4-scanning-for-differences)
 - - - [Markers](#4.1-markers)
 
 [Part 2](#part-2)
